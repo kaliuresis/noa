@@ -62,7 +62,7 @@ function reset_xy()
 
 function world_to_canvas(x, y)
 {
-    const world_width = 56*640;
+    const world_width = 64*512;
     const world_height = world_width*48/64;
     return [width*x/world_width+32*scale,
             height*y/world_height+14*scale]
@@ -352,7 +352,7 @@ function update_orbs(find_chest_orb=true)
         var x = orb_list[i][0];
         var y = orb_list[i][1];
 
-        output.innerHTML += "<p>Orb " + i + " at x = " + (x+0.5)*scale + ", y = " + (y+0.5)*scale + "<\p>";
+        output.innerHTML += "<p>Orb " + i + " at x = " + (x+0.5)*512 + ", y = " + (y+0.5)*512 + "<\p>";
     }
 
     show_search = find_chest_orb;
