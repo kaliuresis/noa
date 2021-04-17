@@ -1,3 +1,5 @@
+//TODO: change map based on ng vs ng+, show parallels(and hell?), check how easy easyzoom integration would be, mouse hover coordinates, click to set position, orb tooltips on map
+
 var map_canvas = null;
 var ctx = null;
 var width = null
@@ -129,6 +131,7 @@ function paint_biome_area_split( x, y, w, h, buffer )
 }
 
 orb_list = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],]
+orb_ids = [1, 0, 2, 4, 8, 9, 10, 3, 5, 6, 7]
 
 function find_normal_orbs()
 {
@@ -352,7 +355,7 @@ function update_orbs(find_chest_orb=true)
         var x = orb_list[i][0];
         var y = orb_list[i][1];
 
-        output.innerHTML += "<p>Orb " + i + " at x = " + (x+0.5)*512 + ", y = " + (y+0.5)*512 + "<\p>";
+        output.innerHTML += "<p>Orb " + orb_ids[i] + " at x = " + (x+0.5)*512 + ", y = " + (y+0.5)*512 + "<\p>";
     }
 
     show_search = find_chest_orb;
