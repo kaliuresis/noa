@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Noita Orb Atlas (beta)</title>
+  <link rel="icon"
+        type="image/webp"
+        href="orbicon.webp">
+  <link rel="stylesheet" href="styles.css">
+  <link href='https://fonts.googleapis.com/css?family=Cinzel Decorative' rel='stylesheet'>
+  <meta name="description" content="Orb Search for Noita">
+  <meta name="author" content="Kaliuresis">
+  <script src="generated/noita_random.js"></script>
+  <script src="orbs.js"></script>
+</head>
+<body onload="init()">
+  <div class="background_dim"></div>
+  <div class="main">
+    <h1>Noita Orb Atlas (beta)</h1>
+    <div class="main_panel">
+      <div class="left_panel">
+        <form onsubmit="return update_orbs_normal()">
+          <div class="row">
+            <span>Seed: <input type="number" value=0 id="seed"></span>
+            <span>NG+ <input type="number" value=1 id="ng"></span>
+          </div>
+          <div class="row">
+            <span>Starting coordinates:</span>
+          </div>
+          <div class="row">
+            <span>x:<input type="number" value=0 id="x"></span>
+            <span>y:<input type="number" value=0 id="y"></span>
+            <span><button type="button" onclick="reset_xy()">zero</button></span>
+          </div>
+          <div class="row">
+            <button type="button" id="true_knowledge_button" onclick="update_orbs_all()">Seek True Knowledge</button>
+            <input type="submit" id="normal_orb_button"value="Normal Orbs Only">
+          </div>
+        </form>
+        <div id="output"></div>
+        <div class="description">
+          <p>
+            This website displays the locations of all the orbs in Noita, including locations to spawn orb 11 from a great chest.
+          </p>
+          <p>
+            There is also a command line version of the great chest searcher that is much faster.
+          </p>
+        </div>
+      </div>
+      <div class="map_panel">
+        <img src="biome_map_newgame_plus.png" alt="Map">
+        <canvas id="map_canvas" width="1280" height="960"> </canvas>
+      </div>
+    </div>
+    <footer><a href="https://github.com/kaliuresis/findorb11/releases/tag/1.0">Command Line Version</a><a href="https://github.com/kaliuresis/noa">Github</a></footer>
+  </div>
+</div>
+</body>
+</html>

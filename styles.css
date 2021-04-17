@@ -1,0 +1,277 @@
+body
+{
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("orbroom.png") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    margin: 1em;
+    text-align: center;
+}
+
+h1
+{
+    margin: 0em;
+    margin-bottom: 0.25em;
+    /* font-style: italic; */
+    font-family: 'Cinzel Decorative';
+    font-size: 2em;
+}
+
+a
+{
+    color: inherit;
+}
+
+.main
+{
+    margin: auto;
+    padding: 1em;
+    display: inline-block;
+    flex-wrap: wrap;
+    background-color: #555555BB;
+    color: #FFFFFF;
+    text-align: center;
+    border-radius: 1em;
+}
+
+.main_panel
+{
+    /* width: 100%; */
+    display: inline-flex;
+    flex-wrap: wrap;
+    text-align: center;
+    justify-content: center;
+}
+
+.main_panel > *
+{
+    display: inline-block;
+    margin: 0.5em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    background-color:#EEEEEE;
+    color: #000000;
+}
+
+.map_panel
+{
+    position: relative;
+    min-width: 20em;
+    max-width: 110vh;
+    width: calc(95vw - 2em - 2em - 24em);
+}
+
+.map_panel > img
+{
+    display: block;
+    top: 0.5em;
+    left: 0.5em;
+    right: 0.5em;
+    width: 100%;
+    image-rendering: auto;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    -o-object-fit: contain;
+    object-fit: contain;
+}
+
+.canvas_box
+{
+    position: absolute;
+    top: 0.5em;
+    bottom: 0.5em;
+    left: 0.5em;
+    right: 0.5em;
+}
+
+canvas
+{
+    display: block;
+    top: 0.5em;
+    left: 0.5em;
+    right: 0.5em;
+    position: absolute;
+    width: calc(100% - 1em);
+    -o-object-fit: contain;
+    object-fit: contain;
+    z-index: 99;
+    /* image-rendering: auto; */
+    /* image-rendering: crisp-edges; */
+    /* image-rendering: pixelated; */
+}
+
+.left_panel
+{
+    width: 20em;
+}
+
+form
+{
+    width:20em;
+    margin: auto;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1em;
+}
+
+.row
+{
+    display: block;
+    margin: 0.5em 0em;
+}
+
+.row > *
+{
+    margin: 0em 0.5em;
+    display: inline-block;
+    position: relative;
+}
+
+*[type=button],
+input
+{
+    padding: 0.5em;
+    /* display: inline-block; */
+    border: none;
+    border-radius: 0.25em;
+    box-sizing: border-box;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  display: none;
+}
+
+input[type=number]
+{
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  background-color: #222222;
+  color: #FFFFFF;
+}
+
+.increment_box
+{
+    width: 1em;
+    display: inline;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    height: 0;
+}
+
+.increment_box > *
+{
+    position: absolute;
+    display: block;
+    height: 1.4em;
+    width: 1.4em;
+    left: 0.6em;
+    text-align: center;
+    padding: 0 0 0.1ex 0;
+    border: none;
+    border-radius: 0.3em;
+    font-size: 0.75em;
+}
+
+.increment_box>*:first-child
+{
+    bottom: 0.1em;
+}
+
+.increment_box>*:last-child
+{
+    top: 0.1em;
+}
+
+#true_knowledge_button
+{
+    padding: 1em;
+    margin: 1em 0.25em 0 0.25em;
+    font-weight: bold;
+    background-color: #770000;
+    color: #FFFFFF;
+}
+
+#true_knowledge_button:hover
+{
+    background-color: #990000;
+}
+
+#normal_orb_button
+{
+    padding: 1em;
+    margin: 1em 0.25em 0 0.25em;
+    font-weight: bold;
+}
+
+*[type=submit],
+*[type=button]
+{
+    background-color: #777777;
+    color: #FFFFFF;
+}
+
+*[type=submit]:hover,
+*[type=button]:hover
+{
+    background-color: #999999;
+}
+
+#seed
+{
+    width: 10em;
+}
+
+#ng
+{
+    width: 3em;
+}
+
+#x, #y
+{
+    width: 7em;
+}
+
+#output
+{
+    position: relative;
+    min-height: 13em;
+    background-color: #AAAAAA;
+    padding: 1em;
+    border-radius: 0.25em;
+}
+
+#output:before
+{
+    display: block;
+    position: absolute;
+    text-align:left;
+    margin: -0.25em;
+    content: "Orbs:";
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+#output > *
+{
+    margin: 0;
+    padding: 0;
+}
+
+footer
+{
+    padding-top: 0.5em;
+}
+
+footer > *
+{
+    margin: 1em;
+}
+
+.description
+{
+    text-align: left;
+}
