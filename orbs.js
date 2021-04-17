@@ -60,134 +60,6 @@ function reset_xy()
     y_input.value = 0;
 }
 
-//NOTE: this JS version works, but is really slow
-// var random_seed = 0
-
-// function Random(a, b)
-
-// {
-//     var iVar1;
-
-//     iVar1 = BigInt(Math.floor(random_seed).toFixed(0)) * BigInt(0x41a7) + (BigInt(Math.floor(random_seed).toFixed(0)) / BigInt(0x1f31d)) * BigInt(-0x7fffffff);
-//     iVar1 = BigInt.asIntN(32, iVar1)
-//     if (iVar1 < BigInt(1)) {
-//         iVar1 = iVar1 + BigInt(0x7fffffff);
-//     }
-//     iVar1 = BigInt.asIntN(32, iVar1)
-//     random_seed = Number(iVar1);
-//     return ~~(a + ~~(-(((b - a) + 1) * (random_seed * -4.656612875e-10))));
-// }
-
-
-// function SetRandomSeedHelper(r)
-// {
-//     var r_ = new Float64Array(1)
-//     r_[0] = r;
-//     var e_ = new BigUint64Array(r_.buffer)
-//     var e = e_[0]
-
-//     if(((e >> BigInt(0x20) & BigInt(0x7fffffff)) < BigInt(0x7FF00000))
-//        && (-9.223372036854776e+18 <= r) && (r < 9.223372036854776e+18))
-//     {
-//         var s = Math.abs(r);
-//         var i = BigInt(0);
-//         if(s != 0.0)
-//         {
-//             var f = (e & BigInt(0xfffffffffffff)) | BigInt(0x0010000000000000);
-//             var g = BigInt(0x433) - (e >> BigInt(0x34));
-//             var h = f >> g;
-
-//             var j = BigInt(-(BigInt(0x433) < ((e >> BigInt(0x20))&BigInt(0xFFFFFFFF)) >> BigInt(0x14)));
-//             i = j<<BigInt(0x20) | j;
-//             i = ~i & h | f << ((BigInt(Math.floor(s)) >> BigInt(0x34)) - BigInt(0x433)) & i;
-//             i = ~-BigInt(r == s) & -i | i & -BigInt(r == s);
-//             //there's some error handling here in the real code that I'm ignoring
-//         }
-//         return i & BigInt(0xFFFFFFFF);
-//     }
-
-//     //error!
-//     const error_ret_val = -0.0;
-//     return error_ret_val;
-// }
-
-// function SetRandomSeedHelper2(param_1, param_2, param_3)
-// {
-//     var uVar1;
-//     var uVar2;
-//     var uVar3;
-//     param_1 = BigInt.asIntN (32, BigInt(param_1))
-//     param_2 = BigInt.asIntN (32, BigInt(param_2))
-//     param_3 = BigInt.asUintN(32, BigInt(param_3))
-
-//     uVar2 = (param_1 - param_2) - param_3 ^ param_3 >> BigInt(0xd);
-//     uVar2 = BigInt.asUintN(32, uVar2)
-//     uVar1 = (param_2 - uVar2) - param_3 ^ uVar2 << BigInt(8);
-//     uVar1 = BigInt.asUintN(32, uVar1)
-//     uVar3 = (param_3 - uVar2) - uVar1 ^ uVar1 >> BigInt(0xd);
-//     uVar3 = BigInt.asUintN(32, uVar3)
-//     uVar2 = (uVar2 - uVar1) - uVar3 ^ uVar3 >> BigInt(0xc);
-//     uVar2 = BigInt.asUintN(32, uVar2)
-//     uVar1 = (uVar1 - uVar2) - uVar3 ^ uVar2 << BigInt(0x10);
-//     uVar1 = BigInt.asUintN(32, uVar1)
-//     uVar3 = (uVar3 - uVar2) - uVar1 ^ uVar1 >> BigInt(5);
-//     uVar3 = BigInt.asUintN(32, uVar3)
-//     uVar2 = (uVar2 - uVar1) - uVar3 ^ uVar3 >> BigInt(3);
-//     uVar2 = BigInt.asUintN(32, uVar2)
-//     uVar1 = (uVar1 - uVar2) - uVar3 ^ uVar2 << BigInt(10);
-//     uVar1 = BigInt.asUintN(32, uVar1)
-//     return BigInt.asUintN(32, (uVar3 - uVar2) - uVar1 ^ uVar1 >> BigInt(0xf));
-// }
-
-
-// function SetRandomSeed(world_seed, x, y)
-// {
-//     var a = world_seed ^ 0x93262e6f;
-//     var b = a & 0xfff;
-//     var c = (a >> 0xc) & 0xfff;
-
-//     x_ = x+b;
-//     y_ = y+c;
-
-//     var r = x_*134217727.0;
-//     var e = SetRandomSeedHelper(r);
-
-//     if(102400.0 <= Math.abs(y_) || Math.abs(x_) <= 1.0)
-//     {
-//         r = y_*134217727.0;
-//     }
-//     else
-//     {
-//         var y__ = y_*3483.328;
-//         var t = Number(e);
-//         y__ += t;
-//         y_ *= y__;
-//         r = y_;
-//     }
-
-//     var f = SetRandomSeedHelper(r);
-
-//     var g = SetRandomSeedHelper2(e, f, world_seed);
-//     var s = Number(g);
-//     s /= 4294967295.0;
-//     s *= 2147483639.0;
-//     s += 1.0;
-
-//     if(2147483647.0 <= s) {
-//         s = s*0.5;
-//     }
-//     random_seed = s
-
-//     Random(0, 0);
-
-//     var h = world_seed&3;
-//     while(h)
-//     {
-//         Random(0, 0);
-//         h--;
-//     }
-// }
-
 function world_to_canvas(x, y)
 {
     const world_width = 56*640;
@@ -440,49 +312,6 @@ function redraw_map()
     }
 }
 
-redraw_interval = null;
-
-function search_for_chest_orb()
-{
-    output = document.getElementById("output");
-
-    x_off = 0;
-    y_off = 0;
-    x_step = 1;
-    y_step = 0;
-    while(true)
-    {
-        search_x = x0+x_off
-        search_y = y0+y_off
-        SetRandomSeed(world_seed, search_x, search_y)
-        if(Random(0, 100000) >= 100000 && Random(0, 1000) == 999)
-        {
-            output.innerHTML = "Great Chest Orb found at x = " + search_x + ", y = " + search_y;
-
-            //stop redraw loop and do one final redraw
-            if(redraw_interval != null)
-            {
-                clearInterval(redraw_interval);
-                redraw_interval = null
-            }
-            search_color = "#FF0000"
-            redraw_map()
-
-            return;
-        }
-
-        x_off += x_step;
-        y_off += y_step;
-        if((Math.abs(x_off) == Math.abs(y_off) && x_step < 1)
-           || (x_off-1.0 == -y_off && x_step >= 1))
-        { //turn
-            var temp = x_step;
-            x_step = -y_step;
-            y_step = temp;
-        }
-    }
-}
-
 function update_orbs(find_chest_orb=true)
 {
     output = document.getElementById("output");
@@ -534,11 +363,6 @@ function update_orbs(find_chest_orb=true)
 
     search_x = x0
     search_y = y0
-
-    // search_color = "#FF00FF"
-    // redraw_interval = setInterval(redraw_map, 1000); //update map at 15 fps
-
-    // search_for_chest_orb()
 
     //TODO: stop this loop if button is pressed a second time, currently prints twice and wastes compute
     function search_step(timestamp)
