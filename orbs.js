@@ -69,6 +69,7 @@ function world_to_canvas(x, y)
 }
 
 var world_seed = 0;
+var effective_world_seed = 0;
 var ng = 0;
 var x0 = 0;
 var y0 = 0;
@@ -131,7 +132,7 @@ orb_list = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],]
 
 function find_normal_orbs()
 {
-    SetRandomSeed(world_seed, 4573, 4621 )
+    SetRandomSeed(effective_world_seed, 4573, 4621 )
 
     //Call Random once for each time it is used by other generation stuff
     var n_random_calls = 0
@@ -323,7 +324,7 @@ function update_orbs(find_chest_orb=true)
     var y_input = document.getElementById("y");
     world_seed = parseInt(seed.value)
     ng = parseInt(ng_input.value)
-    world_seed += ng
+    effective_world_seed = world_seed+ng
     x0 = parseFloat(x_input.value)
     y0 = parseFloat(y_input.value)
 
