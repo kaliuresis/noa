@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Noita Orb Atlas (beta)</title>
+  <title>Noita Orb Atlas</title>
   <link rel="icon"
         type="image/webp"
         href="orbicon.webp">
@@ -16,16 +16,16 @@
 <body onload="init()">
   <div class="background_dim"></div>
   <div class="main">
-    <h1>Noita Orb Atlas (beta)</h1>
+    <h1>Noita Orb Atlas</h1>
     <div class="main_panel">
       <div class="left_panel">
-        <form onsubmit="return update_orbs_normal()">
+        <form onsubmit="return update_orbs()">
           <div class="row">
             <span>Seed: <input type="number" value=0 id="seed"></span>
             <span>NG+ <input type="number" value=1 id="ng"></span>
           </div>
           <div class="row">
-            <span>Starting coordinates:</span>
+            <span>Great Chest Search:</span>
           </div>
           <div class="row">
             <span>x:<input type="number" value=0 id="x"></span>
@@ -33,22 +33,34 @@
             <span><button type="button" onclick="reset_xy()">zero</button></span>
           </div>
           <div class="row">
-            <button type="button" id="true_knowledge_button" onclick="update_orbs_all()">Seek True Knowledge</button>
-            <input type="submit" id="normal_orb_button"value="Normal Orbs Only">
+          </div>
+          <div class="row">
+            <span class="checkbox_container">Spiral Search<input type="checkbox" id="search_spiral"></span>
+            <span class="checkbox_container">Portal Room Search<input type="checkbox" id="search_portal"></span>
+          </div>
+          <div class="row">
+            <button type="submit" id="true_knowledge_button" onclick="update_orbs()">Seek True Knowledge</button>
+            <!-- <input type="submit" id="normal_orb_button"value="Normal Orbs Only"> -->
           </div>
         </form>
-        <div id="output"></div>
+        <div id="output_box">
+          <div id="output"></div>
+          <div id="status"></div>
+        </div>
         <div class="description">
           <p>
             This website displays the locations of all the orbs in Noita, including locations to spawn orb 11 from a great chest.
           </p>
           <p>
+            The Great Chest orb can be obtained by getting a great chest to spawn at exactly the given coordinates. Methods to spawn a great chests include casting end of everything, killing leviathan, or rolling greed dice. This orb has never been obtained in a random-seed unmodded run. The portal room search checks locations that are easy to align for the portal/EoE method (~0.05% chance per seed).
             There is also a command line version of the great chest searcher that is much faster.
           </p>
         </div>
       </div>
       <div class="map_panel">
-        <img src="biome_map_newgame_plus.png" alt="Map">
+        <div id="map_title"></div>
+        <img src="biome_map_newgame_plus.png" id="newgame_plus_map" alt="NG+ Map">
+        <img src="biome_map.png" id="newgame_map" style="display: none;" alt="NG Map">
         <canvas id="map_canvas" width="1280" height="960"> </canvas>
       </div>
     </div>

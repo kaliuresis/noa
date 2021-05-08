@@ -59,11 +59,26 @@ a
     position: relative;
     min-width: 20em;
     max-width: 110vh;
-    width: calc(95vw - 2em - 2em - 24em);
+    width: calc(98vw - 2em - 2em - 24em);
+}
+
+#map_title
+{
+    position: absolute;
+    top: 0.7em;
+    text-align: center;
+    width: 100%;
+    font-size: 2em;
+    font-weight: 1000;
+    color: #FFFFFF;
+    font-family: 'Verdana';
+    -webkit-text-stroke-width: 0.05em;
+    -webkit-text-stroke-color: #000000;
 }
 
 .map_panel > img
 {
+    /* position: absolute; */
     display: block;
     top: 0.5em;
     left: 0.5em;
@@ -74,15 +89,6 @@ a
     image-rendering: pixelated;
     -o-object-fit: contain;
     object-fit: contain;
-}
-
-.canvas_box
-{
-    position: absolute;
-    top: 0.5em;
-    bottom: 0.5em;
-    left: 0.5em;
-    right: 0.5em;
 }
 
 canvas
@@ -127,6 +133,7 @@ form
     position: relative;
 }
 
+*[type=submit],
 *[type=button],
 input
 {
@@ -189,7 +196,7 @@ input[type=number]
 #true_knowledge_button
 {
     padding: 1em;
-    margin: 1em 0.25em 0 0.25em;
+    margin: 0em 0.25em 0 0.25em;
     font-weight: bold;
     background-color: #770000;
     color: #FFFFFF;
@@ -220,6 +227,7 @@ input[type=number]
     background-color: #999999;
 }
 
+
 #seed
 {
     width: 10em;
@@ -235,7 +243,7 @@ input[type=number]
     width: 7em;
 }
 
-#output
+#output_box
 {
     position: relative;
     min-height: 13em;

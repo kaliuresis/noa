@@ -1,4 +1,4 @@
-//TODO: change map based on ng vs ng+, show parallels(and hell?), check how easy easyzoom integration would be, mouse hover coordinates, click to set position, orb tooltips on map
+//TODO: check how easy easyzoom integration would be, mouse hover coordinates, click to set position, orb tooltips on map
 
 var map_canvas = null;
 var ctx = null;
@@ -10,6 +10,15 @@ Random = Module.cwrap('Random', 'number', ['number', 'number'])
 SetRandomSeed = Module.cwrap('SetRandomSeed', null, ['number', 'number', 'number'])
 search_spiral_start = Module.cwrap('search_spiral_start', 'number', ['number', 'number', 'number', 'number'])
 search_spiral_step = Module.cwrap('search_spiral_step', 'number', ['number'])
+search_portal_start = Module.cwrap('search_portal_start', 'number', ['number', 'number'])
+search_portal_step = Module.cwrap('search_portal_step', 'number', ['number'])
+
+function refresh_canvas_size()
+{
+    width = map_canvas.width
+    height = map_canvas.height
+    scale = height/48
+}
 
 function init()
 {
@@ -48,10 +57,8 @@ function init()
     }
 
     map_canvas = document.getElementById('map_canvas');
+    refresh_canvas_size()
     ctx = map_canvas.getContext('2d');
-    width = map_canvas.width
-    height = map_canvas.height
-    scale = width/64
 }
 
 function reset_xy()
@@ -62,11 +69,15 @@ function reset_xy()
     y_input.value = 0;
 }
 
+var parallel_width = (64*512)
+var parallel_left_edge_tile = -32
+var parallel_left_edge = parallel_left_edge_tile*512
+
 function world_to_canvas(x, y)
 {
     const world_width = 64*512;
     const world_height = world_width*48/64;
-    return [width*x/world_width+32*scale,
+    return [width*x/world_width-parallel_left_edge_tile*scale,
             height*y/world_height+14*scale]
 }
 
@@ -75,6 +86,9 @@ var effective_world_seed = 0;
 var ng = 0;
 var x0 = 0;
 var y0 = 0;
+var search_spiral = false;
+var search_portal = false;
+var animation_request_id;
 
 function paint_cave( x, y, dir, length )
 {
@@ -130,8 +144,8 @@ function paint_biome_area_split( x, y, w, h, buffer )
     }
 }
 
-orb_list = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],]
-orb_ids = [1, 0, 2, 4, 8, 9, 10, 3, 5, 6, 7]
+var orb_list = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],]
+var orb_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 function find_normal_orbs()
 {
@@ -277,11 +291,23 @@ function draw_line_segment(x0, y0, x1, y1)
     ctx.stroke();
 }
 
+function get_parallel_name(parallel_number, show_main_world = true)
+{
+    return ((parallel_number > 0) ? "East "+parallel_number
+            : ((parallel_number < 0) ? "West "+(-parallel_number)
+               : (show_main_world) ? "Main World" : ""));
+}
+
+
 var search_x = 0;
 var search_y = 0;
+var search_parallel_number = 0;
+var search_portal_number = 0;
+var search_portal_newgame = 0;
 var search_color = "#FFFFFF";
 var search_color2 = "#FFFFFF";
 var show_search = true;
+var map_title;
 
 function redraw_map()
 {
@@ -294,12 +320,16 @@ function redraw_map()
         ctx.lineWidth = 2
         ctx.fillStyle = "#3892E5";
         ctx.strokeStyle = "#FFFFFF";
-        draw_disc((x+32+0.5)*scale, (y+14+0.5)*scale, 0.5*scale)
+        draw_disc((x-parallel_left_edge_tile+0.5)*scale, (y+14+0.5)*scale, 0.5*scale)
     }
 
     if(show_search)
     {
-        p = world_to_canvas(search_x, search_y);
+        var show_x = ((((search_x-parallel_left_edge)%parallel_width)+parallel_width)%parallel_width)+parallel_left_edge;
+        var parallel_number = Math.floor((search_x-parallel_left_edge)/parallel_width)
+        map_title.innerHTML = get_parallel_name(parallel_number, false)
+
+        p = world_to_canvas(show_x, search_y);
         var x = p[0]
         var y = p[1]
 
@@ -316,95 +346,158 @@ function redraw_map()
     }
 }
 
-function update_orbs(find_chest_orb=true)
+function update_orbs()
 {
-    output = document.getElementById("output");
+    var output = document.getElementById("output");
     output.innerHTML = "";
+    var status = document.getElementById("status");
+    status.innerHTML = "Searching...";
+    map_title = document.getElementById("map_title")
+    map_title.innerHTML = "";
 
     var seed_input = document.getElementById("seed");
     var ng_input = document.getElementById("ng");
     var x_input = document.getElementById("x");
     var y_input = document.getElementById("y");
+    var search_spiral_input = document.getElementById("search_spiral")
+    var search_portal_input = document.getElementById("search_portal")
+    var newgame_plus_map = document.getElementById("newgame_plus_map")
+    var newgame_map = document.getElementById("newgame_map")
     world_seed = parseInt(seed.value)
     ng = parseInt(ng_input.value)
     effective_world_seed = world_seed+ng
     x0 = parseFloat(x_input.value)
     y0 = parseFloat(y_input.value)
-
-    orb_list = [
-        [8,1],
-        [1,-3],
-        [-9,7],
-        [-8,19],
-        [-18,28],
-        [-20,5],
-        [-1,31],
-        [20,31],
-	    [19,5],
-	    [6,3],
-	    [19,-3],
-    ];
+    search_spiral = search_spiral_input.checked
+    search_portal = search_portal_input.checked
 
     if(ng > 0)
     {
+        map_canvas.width = 1280
+        refresh_canvas_size()
+        newgame_map.style.display = "none"
+        newgame_plus_map.style.display = "block"
+    }
+    else
+    {
+        map_canvas.width = 1280*70/64
+        refresh_canvas_size()
+        newgame_map.style.display = "block"
+        newgame_plus_map.style.display = "none"
+    }
+
+    parallel_width = (ng > 0) ? (64*512) : (70*512)
+    parallel_left_edge_tile = (ng > 0) ? (-32) : (-35)
+    parallel_left_edge = parallel_left_edge_tile*512
+    var find_chest_orb = search_spiral || search_portal
+
+    orb_list = [
+        [1,-3],
+	    [19,-3],
+        [-20,5],
+	    [6,3],
+	    [19,5],
+        [-9,7],
+        [-8,19],
+        [8,1],
+        [-1,31],
+        [-18,28],
+        [20,31],
+    ];
+    orb_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    if(ng > 0)
+    {
+        // orb_ids = [1, 0, 2, 4, 8, 9, 10, 3, 5, 6, 7]
+        orb_indices = [1, 0, 2, 7, 3, 8, 9, 10, 4, 5, 6]
         find_normal_orbs();
     }
 
     for(var i = 0; i < orb_list.length; i++)
     {
-        var x = orb_list[i][0];
-        var y = orb_list[i][1];
+        var x = orb_list[orb_indices[i]][0];
+        var y = orb_list[orb_indices[i]][1];
 
-        output.innerHTML += "<p>Orb " + orb_ids[i] + " at x = " + (x+0.5)*512 + ", y = " + (y+0.5)*512 + "<\p>";
+        output.innerHTML += "<p>Orb " + i + " at x = " + (x+0.5)*512 + ", y = " + (y+0.5)*512 + "<\p>";
     }
 
-    show_search = find_chest_orb;
-    if(!find_chest_orb)
-    {
-        redraw_map();
-        return false;
-    }
+    show_search = search_spiral;
+    redraw_map();
 
     search_x = x0
     search_y = y0
 
+    var parallel_name = ""
     //TODO: stop this loop if button is pressed a second time, currently prints twice and wastes compute
     function search_step(timestamp)
     {
         search_color = "#7F5476"
         search_color2 = "#7F5476"
-        search_x = getValue(search_result_ptr, "double");
-        search_y = getValue(search_result_ptr+8, "double");
+        search_x = getValue(search_spiral_result_ptr, "double");
+        search_y = getValue(search_spiral_result_ptr+8, "double");
         redraw_map();
 
-        if(!search_spiral_step(20000))
+        var found_spiral = false
+        found_spiral = search_spiral_step(19997)
+
+        if(!found_spiral)
         {
-            window.requestAnimationFrame(search_step);
+            animation_request_id = window.requestAnimationFrame(search_step);
             return;
         }
 
-        search_x = getValue(search_result_ptr, "double");
-        search_y = getValue(search_result_ptr+8, "double");
+        search_x = getValue(search_spiral_result_ptr, "double");
+        search_y = getValue(search_spiral_result_ptr+8, "double");
 
         search_color = "#FF5E26"
         search_color2 = "#FFE385"
         redraw_map();
         output.innerHTML += "<p>Great Chest Orb found at</p><p>x = " + search_x + ", y = " + search_y + "<\p>";
+        status.innerHTML = "";
+    }
+
+    var found_portal = false
+    var search_portal_x = 0
+    var search_portal_y = 0
+    if(search_portal)
+    {
+        var search_portal_result_ptr = search_portal_start(world_seed, 0);
+
+        var found_portal = search_portal_step(300)
+
+        search_parallel_number = getValue(search_portal_result_ptr, "i64");
+        search_portal_number = getValue(search_portal_result_ptr+8, "i64");
+        search_portal_newgame = getValue(search_portal_result_ptr+16, "i64");
+        search_portal_x = getValue(search_portal_result_ptr+24, "double");
+        search_portal_y = getValue(search_portal_result_ptr+32, "double");
+
+        parallel_name = get_parallel_name(search_parallel_number)
+        // output.innerHTML += "Searching for portals in "+parallel_name+"...";
+
+        if(found_portal)
+        {
+            redraw_map();
+            var portal_name = ["top left",
+                               "top right",
+                               "middle left",
+                               "middle right",
+                               "bottom left",
+                               "bottom right",]
+
+            output.innerHTML += "<p>Great Chest Orb found in NG+"+search_portal_newgame+" at destination of " + parallel_name + " " + portal_name[search_portal_number] +
+                " portal room portal,</p><p>x = " + search_portal_x + ", y = " + search_portal_y + "<\p>";
+        }
+        else
+        {
+            output.innerHTML += "<p>No Great Chest Orbs found in portal room destinations before NG+"+search_portal_newgame+", parallels < "+Math.abs(search_parallel_number);
+        }
     }
 
     //start the search
-    var search_result_ptr = search_spiral_start(world_seed, ng, x0, y0);
-    window.requestAnimationFrame(search_step);
+    var search_spiral_result_ptr = search_spiral_start(world_seed, ng, x0, y0);
+    window.cancelAnimationFrame(animation_request_id);
+    if(search_spiral) animation_request_id = window.requestAnimationFrame(search_step);
+    else status.innerHTML = "";
 
     return false;
-}
-
-function update_orbs_all()
-{
-    return update_orbs(true);
-}
-
-function update_orbs_normal()
-{
-    return update_orbs(false);
 }

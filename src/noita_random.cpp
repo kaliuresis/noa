@@ -149,7 +149,7 @@ void SetRandomSeed(uint world_seed, double x, double y)
 
 uint world_seed = 0;
 
-double search_result[2] = {};
+double search_spiral_result[2] = {};
 
 double x_center = 0.0;
 double y_center = 0.0;
@@ -178,10 +178,10 @@ double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double 
     x_center = x;
     y_center = y;
 
-    search_result[0] = x;
-    search_result[1] = y;
+    search_spiral_result[0] = x;
+    search_spiral_result[1] = y;
 
-    return search_result;
+    return search_spiral_result;
 }
 
 }
@@ -192,8 +192,8 @@ extern "C"
 int search_spiral_step(uint max_iterations)
 {
     //search for a magic pixel in a spiral
-    double x_seed = search_result[0];
-    double y_seed = search_result[1];
+    double x_seed = search_spiral_result[0];
+    double y_seed = search_spiral_result[1];
 
     for(int i = 0; i < max_iterations; i++)
     {
@@ -202,8 +202,8 @@ int search_spiral_step(uint max_iterations)
         SetRandomSeed(world_seed, x_seed, y_seed);
         if(Random(0, 100000) == 100000 && Random(0, 1000) == 999)
         {
-            search_result[0] = x_seed;
-            search_result[1] = y_seed;
+            search_spiral_result[0] = x_seed;
+            search_spiral_result[1] = y_seed;
             return true;
         }
 
@@ -218,8 +218,104 @@ int search_spiral_step(uint max_iterations)
         }
     }
 
-    search_result[0] = x_seed;
-    search_result[1] = y_seed;
+    search_spiral_result[0] = x_seed;
+    search_spiral_result[1] = y_seed;
+    return false;
+}
+
+}
+
+int64 search_portal_result[5] = {}; //parallel number, portal number, x (double), y (double)
+
+double parallel_width = 64*512;
+uint portal_world_seed;
+
+double x_portal_room = (42-32)*512;
+double y_portal_room = (28-14)*512;
+
+const double portal_list[] =
+{
+    127-13624, 131-13824,
+    366+7480 , 134-12288,
+    124-17920, 257-7408 ,
+    372+10240, 280+0    ,
+    137-12800, 382+7008 ,
+    358-4396 , 389+8504 ,
+};
+
+extern "C"
+{
+
+int64* search_portal_start(uint raw_world_seed, int64 parallel_number)
+{
+    portal_world_seed = raw_world_seed;
+
+    search_portal_result[0] = parallel_number;
+    search_portal_result[1] = 0;
+    search_portal_result[2] = 0;
+    search_portal_result[3] = 0;
+    search_portal_result[4] = 0;
+
+    return search_portal_result;
+}
+
+}
+
+extern "C"
+{
+
+int search_portal_step(uint max_iterations)
+{
+    //search for a magic pixel in a portal
+    int64 parallel_number = search_portal_result[0];
+    double x_seed = 0;
+    double y_seed = 0;
+
+    int newgame = 0;
+    int p = 0;
+    for(int i = 0; i < max_iterations; i++)
+    {
+
+        for(newgame = 0; newgame <= 28; newgame++)
+        {
+            if(newgame > 0)
+            {
+                x_portal_room = (42-32)*512;
+                y_portal_room = (28-14)*512;
+                parallel_width = 64*512;
+            }
+            else
+            {
+                x_portal_room = (42-35)*512;
+                y_portal_room = (28-14)*512;
+                parallel_width = 70*512;
+            }
+
+            for(p = 0; p < 6; p++)
+            {
+                x_seed = floor(x_portal_room+parallel_number*parallel_width+portal_list[2*p+0]);
+                y_seed = floor(y_portal_room+portal_list[2*p+1]);
+                SetRandomSeed(portal_world_seed+newgame, x_seed, y_seed);
+                if(Random(0, 100000) == 100000 && Random(0, 1000) == 999)
+                {
+                    search_portal_result[0] = parallel_number;
+                    search_portal_result[1] = p;
+                    search_portal_result[2] = newgame;
+                    search_portal_result[3] = *((int64*) &x_seed);
+                    search_portal_result[4] = *((int64*) &y_seed);
+                    return true;
+                }
+            }
+        }
+        if(parallel_number > 0) parallel_number =  -parallel_number;
+        else                    parallel_number = 1-parallel_number;
+    }
+
+    search_portal_result[0] = parallel_number;
+    search_portal_result[1] = p;
+    search_portal_result[2] = newgame;
+    search_portal_result[3] = *((int64*) &x_seed);
+    search_portal_result[4] = *((int64*) &y_seed);
     return false;
 }
 

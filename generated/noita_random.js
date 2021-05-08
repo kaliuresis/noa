@@ -1336,11 +1336,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5244672,
+    STACK_BASE = 5244832,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 1792,
-    DYNAMIC_BASE = 5244672,
-    DYNAMICTOP_PTR = 1632;
+    STACK_MAX = 1952,
+    DYNAMIC_BASE = 5244832,
+    DYNAMICTOP_PTR = 1792;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1939,7 +1939,7 @@ var ASM_CONSTS = {
 
 
 
-// STATICTOP = STATIC_BASE + 768;
+// STATICTOP = STATIC_BASE + 928;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -1996,7 +1996,7 @@ var ASM_CONSTS = {
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 1632;
+      return 1792;
     }
 
   
@@ -2079,6 +2079,20 @@ var _search_spiral_step = Module["_search_spiral_step"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["search_spiral_step"].apply(null, arguments)
+};
+
+/** @type {function(...*):?} */
+var _search_portal_start = Module["_search_portal_start"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["search_portal_start"].apply(null, arguments)
+};
+
+/** @type {function(...*):?} */
+var _search_portal_step = Module["_search_portal_step"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["search_portal_step"].apply(null, arguments)
 };
 
 /** @type {function(...*):?} */
