@@ -1,4 +1,4 @@
-//TODO: check how easy easyzoom integration would be, mouse hover coordinates, click to set position, orb tooltips on map
+//TODO: check how easy easyzoom integration would be, mouse hover coordinates, click to set position, orb tooltips on map, way to mark found orbs (include separate marking for parallels)
 
 var map_canvas = null;
 var ctx = null;
@@ -8,9 +8,9 @@ var scale = 0
 
 Random = Module.cwrap('Random', 'number', ['number', 'number'])
 SetRandomSeed = Module.cwrap('SetRandomSeed', null, ['number', 'number', 'number'])
-search_spiral_start = Module.cwrap('search_spiral_start', 'number', ['number', 'number', 'number', 'number'])
+search_spiral_start = Module.cwrap('search_spiral_start', 'number', ['number', 'number', 'number', 'number', 'number'])
 search_spiral_step = Module.cwrap('search_spiral_step', 'number', ['number'])
-search_portal_start = Module.cwrap('search_portal_start', 'number', ['number', 'number'])
+search_portal_start = Module.cwrap('search_portal_start', 'number', ['number', 'number', 'number'])
 search_portal_step = Module.cwrap('search_portal_step', 'number', ['number'])
 
 function refresh_canvas_size()
@@ -86,9 +86,11 @@ var effective_world_seed = 0;
 var ng = 0;
 var x0 = 0;
 var y0 = 0;
+var find_sampo = false;
 var search_spiral = false;
 var search_portal = false;
 var animation_request_id;
+var mcguffin_name = "Great Chest Orb"
 
 function paint_cave( x, y, dir, length )
 {
@@ -200,7 +202,7 @@ function find_normal_orbs()
 
     if(do_walls)
     {
-        n_random_calls += 2+2*3;
+        n_random_calls += 2+2*2;
     }
     for(var i = 0; i < n_random_calls; i++)
     {
@@ -217,6 +219,14 @@ function find_normal_orbs()
 
     // floating island
     orb_list[1] = [33,11]
+
+    // console.log("Random(0, 0x1000000)'s")
+
+    // console.log(Random(0, 0x1000000))
+    // console.log(Random(0, 0x1000000))
+
+    // console.log(Random(0, 0x1000000))
+    // console.log(Random(0, 0x1000000))
 
     // vault 2
     x = Random( 0, 5 ) + 10
@@ -359,8 +369,9 @@ function update_orbs()
     var ng_input = document.getElementById("ng");
     var x_input = document.getElementById("x");
     var y_input = document.getElementById("y");
+    var find_sampo_input = document.getElementById("find_sampo")
     var search_spiral_input = document.getElementById("search_spiral")
-    var search_portal_input = document.getElementById("search_portal")
+    // var search_portal_input = document.getElementById("search_portal")
     var newgame_plus_map = document.getElementById("newgame_plus_map")
     var newgame_map = document.getElementById("newgame_map")
     world_seed = parseInt(seed.value)
@@ -368,8 +379,10 @@ function update_orbs()
     effective_world_seed = world_seed+ng
     x0 = parseFloat(x_input.value)
     y0 = parseFloat(y_input.value)
+    find_sampo = find_sampo_input.checked
     search_spiral = search_spiral_input.checked
-    search_portal = search_portal_input.checked
+    // search_portal = search_portal_input.checked
+    mcguffin_name = (find_sampo ? "Sampo" : "Great Chest Orb")
 
     if(ng > 0)
     {
@@ -452,7 +465,7 @@ function update_orbs()
         search_color = "#FF5E26"
         search_color2 = "#FFE385"
         redraw_map();
-        output.innerHTML += "<p>Great Chest Orb found at</p><p>x = " + search_x + ", y = " + search_y + "<\p>";
+        output.innerHTML += "<p>"+mcguffin_name+" found at</p><p>x = " + search_x + ", y = " + search_y + "<\p>";
         status.innerHTML = "";
     }
 
@@ -461,13 +474,13 @@ function update_orbs()
     var search_portal_y = 0
     if(search_portal)
     {
-        var search_portal_result_ptr = search_portal_start(world_seed, 0);
+        var search_portal_result_ptr = search_portal_start(world_seed, 0, find_sampo);
 
         var found_portal = search_portal_step(300)
 
         search_parallel_number = getValue(search_portal_result_ptr, "i64");
-        search_portal_number = getValue(search_portal_result_ptr+8, "i64");
-        search_portal_newgame = getValue(search_portal_result_ptr+16, "i64");
+        search_portal_number   = getValue(search_portal_result_ptr+8, "i64");
+        search_portal_newgame  = getValue(search_portal_result_ptr+16, "i64");
         search_portal_x = getValue(search_portal_result_ptr+24, "double");
         search_portal_y = getValue(search_portal_result_ptr+32, "double");
 
@@ -484,17 +497,17 @@ function update_orbs()
                                "bottom left",
                                "bottom right",]
 
-            output.innerHTML += "<p>Great Chest Orb found in NG+"+search_portal_newgame+" at destination of " + parallel_name + " " + portal_name[search_portal_number] +
+            output.innerHTML += "<p>"+mcguffin_name+" found in NG+"+search_portal_newgame+" at destination of " + parallel_name + " " + portal_name[search_portal_number] +
                 " portal room portal,</p><p>x = " + search_portal_x + ", y = " + search_portal_y + "<\p>";
         }
         else
         {
-            output.innerHTML += "<p>No Great Chest Orbs found in portal room destinations before NG+"+search_portal_newgame+", parallels < "+Math.abs(search_parallel_number);
+            output.innerHTML += "<p>No "+mcguffin_name+"s found in portal room destinations up to NG+"+(search_portal_newgame-1)+", parallels < "+Math.abs(search_parallel_number);
         }
     }
 
     //start the search
-    var search_spiral_result_ptr = search_spiral_start(world_seed, ng, x0, y0);
+    var search_spiral_result_ptr = search_spiral_start(world_seed, ng, x0, y0, find_sampo);
     window.cancelAnimationFrame(animation_request_id);
     if(search_spiral) animation_request_id = window.requestAnimationFrame(search_step);
     else status.innerHTML = "";

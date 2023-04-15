@@ -35,11 +35,12 @@
           <div class="row">
           </div>
           <div class="row">
-            <span class="checkbox_container">Spiral Search<input type="checkbox" id="search_spiral"></span>
-            <span class="checkbox_container">Portal Room Search<input type="checkbox" id="search_portal"></span>
+            <span class="checkbox_container">Great Chest Search<input type="checkbox" id="search_spiral"></span>
+            <!-- <span class="checkbox_container">Portal Room Search<input type="checkbox" id="search_portal"></span> -->
+            <span class="checkbox_container">Find Sampo<input type="checkbox" id="find_sampo"></span>
           </div>
           <div class="row">
-            <button type="submit" id="true_knowledge_button" onclick="update_orbs()">Seek True Knowledge</button>
+            <button type="submit" id="true_knowledge_button">Seek True Knowledge</button>
             <!-- <input type="submit" id="normal_orb_button"value="Normal Orbs Only"> -->
           </div>
         </form>
@@ -52,7 +53,10 @@
             This website displays the locations of all the orbs in Noita, including locations to spawn orb 11 from a great chest.
           </p>
           <p>
-            The Great Chest orb can be obtained by getting a great chest to spawn at exactly the given coordinates. Methods to spawn a great chests include casting end of everything, killing leviathan, or rolling greed dice. This orb has never been obtained in a random-seed unmodded run. The portal room search checks locations that are easy to align for the portal/EoE method (~0.05% chance per seed).
+            The Great Chest orb can be obtained by getting a great chest to spawn at exactly the given coordinates. Methods to spawn a great chests include casting end of everything, killing leviathan, or rolling greed dice. You can align an EoE cast at the pixel found by locking yourself in the approximate location, then checking your save00/player.xml.
+          </p>
+          <p>
+            If the Find Sampo option is turned on, it will search for great chest locations that spawn a sampo instead of an orb.
             There is also a command line version of the great chest searcher that is much faster.
           </p>
         </div>

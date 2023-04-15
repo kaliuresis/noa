@@ -160,30 +160,33 @@ double y_off = 0.0;
 double x_step = 1.0;
 double y_step = 0.0;
 
+bool sampo_only = false;
+
 const double epsilon = 0.1;
 
 extern "C"
 {
 
-double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y)
-{
-    world_seed = raw_world_seed + newgame;
+    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, bool find_sampo_only)
+    {
+        world_seed = raw_world_seed + newgame;
 
-    x_off = 0.0;
-    y_off = 0.0;
+        x_off = 0.0;
+        y_off = 0.0;
 
-    x_step = 1.0;
-    y_step = 0.0;
+        x_step = 1.0;
+        y_step = 0.0;
 
-    x_center = x;
-    y_center = y;
+        x_center = x;
+        y_center = y;
 
-    search_spiral_result[0] = x;
-    search_spiral_result[1] = y;
+        search_spiral_result[0] = x;
+        search_spiral_result[1] = y;
 
-    return search_spiral_result;
-}
+        sampo_only = find_sampo_only;
 
+        return search_spiral_result;
+    }
 }
 
 extern "C"
@@ -200,7 +203,10 @@ int search_spiral_step(uint max_iterations)
         x_seed = floor(x_center+x_off);
         y_seed = floor(y_center+y_off);
         SetRandomSeed(world_seed, x_seed, y_seed);
-        if(Random(0, 100000) == 100000 && Random(0, 1000) == 999)
+        bool success = false;
+        if(sampo_only) success = Random(0, 100000) == 100000 && Random(0, 1000) != 999;
+        else           success = Random(0, 100000) == 100000 && Random(0, 1000) == 999;
+        if(success)
         {
             search_spiral_result[0] = x_seed;
             search_spiral_result[1] = y_seed;
@@ -225,10 +231,12 @@ int search_spiral_step(uint max_iterations)
 
 }
 
-int64 search_portal_result[5] = {}; //parallel number, portal number, x (double), y (double)
+int64 search_portal_result[5] = {}; //parallel number, portal number, new game number, x (double), y (double)
 
 double parallel_width = 64*512;
 uint portal_world_seed;
+
+bool portal_sampo_only = false;
 
 double x_portal_room = (42-32)*512;
 double y_portal_room = (28-14)*512;
@@ -246,18 +254,20 @@ const double portal_list[] =
 extern "C"
 {
 
-int64* search_portal_start(uint raw_world_seed, int64 parallel_number)
-{
-    portal_world_seed = raw_world_seed;
+    int64* search_portal_start(uint raw_world_seed, int64 parallel_number, bool find_sampo_only)
+    {
+        portal_world_seed = raw_world_seed;
 
-    search_portal_result[0] = parallel_number;
-    search_portal_result[1] = 0;
-    search_portal_result[2] = 0;
-    search_portal_result[3] = 0;
-    search_portal_result[4] = 0;
+        search_portal_result[0] = parallel_number;
+        search_portal_result[1] = 0;
+        search_portal_result[2] = 0;
+        search_portal_result[3] = 0;
+        search_portal_result[4] = 0;
 
-    return search_portal_result;
-}
+        portal_sampo_only = find_sampo_only;
+
+        return search_portal_result;
+    }
 
 }
 
@@ -271,7 +281,7 @@ int search_portal_step(uint max_iterations)
     double x_seed = 0;
     double y_seed = 0;
 
-    int newgame = 0;
+    int64 newgame = 0;
     int p = 0;
     for(int i = 0; i < max_iterations; i++)
     {
@@ -295,8 +305,13 @@ int search_portal_step(uint max_iterations)
             {
                 x_seed = floor(x_portal_room+parallel_number*parallel_width+portal_list[2*p+0]);
                 y_seed = floor(y_portal_room+portal_list[2*p+1]);
-                SetRandomSeed(portal_world_seed+newgame, x_seed, y_seed);
-                if(Random(0, 100000) == 100000 && Random(0, 1000) == 999)
+                uint world_seed = portal_world_seed+newgame;
+                SetRandomSeed(world_seed, x_seed, y_seed);
+                bool success = false;
+                //NOTE: for some reason this does not work, but I'm going to remove it anyway so not worth debugging
+                if(portal_sampo_only) success = Random(0, 10) == 10 && Random(0, 1000) != 999;
+                else                  success = Random(0, 100000) == 100000 && Random(0, 1000) == 999;
+                if(success)
                 {
                     search_portal_result[0] = parallel_number;
                     search_portal_result[1] = p;
