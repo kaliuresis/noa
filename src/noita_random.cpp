@@ -1,155 +1,701 @@
-#include <stdint.h>
-#include <math.h>
+#include <cmath>
 
+typedef unsigned char byte;
+typedef signed char sbyte;
+typedef unsigned short ushort;
 typedef unsigned int uint;
+typedef unsigned long long int ulong;
 
-typedef uint8_t byte;
-typedef int8_t int8;
-typedef int16_t int16;
-typedef int32_t int32;
-typedef int64_t int64;
-typedef uint8_t uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef uint64_t uint64;
-typedef uint8 bool8;
-
-#define ever (;;)
-
-#define len(array) sizeof(array)/sizeof((array)[0])
-
-double random_seed = 0;
-
-extern "C"
+class NoitaRandom
 {
+public:
+	int randomCTR = 0;
 
-int Random(int a, int b)
+	NoitaRandom(uint worldSeed)
+	{
+		SetWorldSeed(worldSeed);
+	}
 
+	uint world_seed = 0;
+
+	ulong SetRandomSeedHelper(double r)
+	{
+		ulong e = *(ulong*)&r;
+
+		if (((e >> 0x20 & 0x7fffffff) < 0x7ff00000) && (-9.223372036854776e+18 <= r) && (r < 9.223372036854776e+18))
+		{
+			e <<= 1;
+			e >>= 1;
+			double s = *(double*)&e;
+			ulong i = 0;
+			if (s != 0.0)
+			{
+				ulong f = (e & 0xfffffffffffff) | 0x0010000000000000;
+				ulong g = 0x433 - (e >> 0x34);
+				ulong h = f >> (int)g;
+
+				uint j = ~(uint)(0x433 < (((e >> 0x20) & 0xffffffff) >> 0x14) ? 1 : 0) + 1;
+				i = (ulong)j << 0x20 | j;
+				i = ~i & h | f << (((int)s >> 0x34) - 0x433) & i;
+				i = ~(~(uint)(r == s ? 1 : 0) + 1) & (~i + 1) | i & (~(uint)(r == s ? 1 : 0) + 1);
+			}
+			return i & 0xffffffff;
+		}
+		return 0;
+	}
+
+	uint SetRandomSeedHelper2(uint a, uint b, uint ws)
+	{
+		uint uVar1;
+		uint uVar2;
+		uint uVar3;
+
+		uVar2 = (a - b) - ws ^ ws >> 0xd;
+		uVar1 = (b - uVar2) - ws ^ uVar2 << 8;
+		uVar3 = (ws - uVar2) - uVar1 ^ uVar1 >> 0xd;
+		uVar2 = (uVar2 - uVar1) - uVar3 ^ uVar3 >> 0xc;
+		uVar1 = (uVar1 - uVar2) - uVar3 ^ uVar2 << 0x10;
+		uVar3 = (uVar3 - uVar2) - uVar1 ^ uVar1 >> 5;
+		uVar2 = (uVar2 - uVar1) - uVar3 ^ uVar3 >> 3;
+		uVar1 = (uVar1 - uVar2) - uVar3 ^ uVar2 << 10;
+		return (uVar3 - uVar2) - uVar1 ^ uVar1 >> 0xf;
+	}
+
+	double Seed;
+
+	uint H2(uint a, uint b, uint ws)
+	{
+		uint v3;
+		uint v4;
+		uint v5;
+		int v6;
+		uint v7;
+		uint v8;
+		int v9;
+
+		v3 = (ws >> 13) ^ (b - a - ws);
+		v4 = (v3 << 8) ^ (a - v3 - ws);
+		v5 = (v4 >> 13) ^ (ws - v3 - v4);
+		v6 = (int)((v5 >> 12) ^ (v3 - v4 - v5));
+		v7 = (uint)(v6 << 16) ^ (uint)(v4 - v6 - v5);
+		v8 = (v7 >> 5) ^ (uint)(v5 - v6 - v7);
+		v9 = (int)((v8 >> 3) ^ (uint)(v6 - v7 - v8));
+		return (((uint)(v9 << 10) ^ (uint)(v7 - v9 - v8)) >> 15) ^ (uint)(v8 - v9 - ((uint)(v9 << 10) ^ (uint)(v7 - v9 - v8)));
+	}
+
+	void SetRandomFromWorldSeed()
+	{
+		Seed = world_seed;
+		if (2147483647.0 <= Seed)
+		{
+			Seed = world_seed * 0.5;
+		}
+	}
+
+	void SetRandomSeed(double x, double y)
+	{
+		randomCTR = 0;
+
+		uint ws = world_seed;
+		uint a = ws ^ 0x93262e6f;
+		uint b = a & 0xfff;
+		uint c = (a >> 0xc) & 0xfff;
+
+		double x_ = x + b;
+
+		double y_ = y + c;
+
+		double r = x_ * 134217727.0;
+		ulong e = SetRandomSeedHelper(r);
+
+		ulong _x = *(ulong*)&x_ & 0x7fffffffffffffff;
+		ulong _y = *(ulong*)&y_ & 0x7fffffffffffffff;
+		if (102400.0 <= *(double*)&_y || *(double*)&_x <= 1.0)
+		{
+			r = y_ * 134217727.0;
+		}
+		else
+		{
+			double y__ = y_ * 3483.328;
+			double t = e;
+			y__ += t;
+			y_ *= y__;
+			r = y_;
+		}
+
+		ulong f = SetRandomSeedHelper(r);
+
+		uint g = SetRandomSeedHelper2((uint)e, (uint)f, ws);
+		double s = g;
+		s /= 4294967295.0;
+		s *= 2147483639.0;
+		s += 1.0;
+
+		if (2147483647.0 <= s)
+		{
+			s *= 0.5;
+		}
+
+		Seed = s;
+
+		Next();
+
+		uint h = ws & 3;
+		while (h > 0)
+		{
+			Next();
+			h--;
+		}
+	}
+
+	uint NextU()
+	{
+		Next();
+		return (uint)((Seed * 4.656612875e-10) * 2147483645.0);
+	}
+
+	double Next()
+	{
+		randomCTR++;
+		int v4 = (int)Seed * 0x41a7 + ((int)Seed / 0x1f31d) * -0x7fffffff;
+		if (v4 < 0)
+		{
+			v4 += 0x7fffffff;
+		}
+		Seed = v4;
+		return Seed / 0x7fffffff;
+	}
+
+	int Random(int a, int b)
+	{
+		return a + (int)((b + 1 - a) * Next());
+	}
+
+	void SetWorldSeed(uint worldseed)
+	{
+		world_seed = worldseed;
+	}
+
+	float ProceduralRandomf(double x, double y, double a, double b)
+	{
+		SetRandomSeed(x, y);
+		return (float)(a + ((b - a) * Next()));
+	}
+
+	int ProceduralRandomi(double x, double y, double a, double b)
+	{
+		SetRandomSeed(x, y);
+		return Random((int)a, (int)b);
+	}
+
+	float GetDistribution(float mean, float sharpness, float baseline)
+	{
+		int i = 0;
+		do
+		{
+			float r1 = (float)Next();
+			float r2 = (float)Next();
+			float div = fabsf(r1 - mean);
+			if (r2 < ((1.0 - div) * baseline))
+			{
+				return r1;
+			}
+			if (div < 0.5)
+			{
+				// double v11 = sin(((0.5f - mean) + r1) * M_PI);
+				float v11 = sinf(((0.5f - mean) + r1) * 3.1415f);
+				float v12 = powf(v11, sharpness);
+				if (v12 > r2)
+				{
+					return r1;
+				}
+			}
+			i++;
+		} while (i < 100);
+		return (float)Next();
+	}
+
+	int RandomDistribution(int min, int max, int mean, float sharpness)
+	{
+		if (sharpness == 0)
+		{
+			return Random(min, max);
+		}
+
+		float adjMean = (mean - min) / (float)(max - min);
+		float v7 = GetDistribution(adjMean, sharpness, 0.005f); // Baseline is always this
+		int d = (int)roundf((max - min) * v7);
+		return min + d;
+	}
+
+	int RandomDistribution(float min, float max, float mean, float sharpness)
+	{
+		return RandomDistribution((int)min, (int)max, (int)mean, (int)sharpness);
+	}
+
+	float RandomDistributionf(float min, float max, float mean, float sharpness)
+	{
+		if (sharpness == 0.0)
+		{
+			float r = (float)Next();
+			return (r * (max - min)) + min;
+		}
+		float adjMean = (mean - min) / (max - min);
+		return min + (max - min) * GetDistribution(adjMean, sharpness, 0.005f); // Baseline is always this
+	}
+};
+
+
+enum WandStat
 {
-    int iVar1;
+	RELOAD,
+	CAST_DELAY,
+	SPREAD,
+	SPEED_MULT,
+	CAPACITY,
+	MULTICAST,
+	SHUFFLE
+};
 
-    iVar1 = (int) random_seed * 0x41a7 + ((int) random_seed / 0x1f31d) * -0x7fffffff;
-    if (iVar1 < 1) {
-        iVar1 = iVar1 + 0x7fffffff;
-    }
-    random_seed = (double)iVar1;
-    return a - (int)((double)((b - a) + 1) * (double)iVar1 * -4.656612875e-10);
+struct Wand
+{
+	int level=0;
+	bool isBetter=false;
+
+	float cost = 0;
+	float capacity = 0;
+	int multicast = 0;
+	int mana = 0;
+	int regen = 0;
+	int delay = 0;
+	int reload = 0;
+	float speed = 0;
+	int spread = 0;
+	bool shuffle = 0;
+
+	float prob_unshuffle = 0;
+	float prob_draw_many = 0;
+	bool force_unshuffle = false;
+	bool is_rare = false;
+
+	//int spellIdx;
+	//Spell alwaysCast;
+	//Spell spells[67];
+};
+
+struct StatProb
+{
+	float prob;
+	float min;
+	float max;
+	float mean;
+	float sharpness;
+};
+
+struct StatProbBlock
+{
+	WandStat stat;
+	int count;
+	StatProb probs[10];
+};
+
+
+StatProbBlock statProbabilities[] = {
+{
+	CAPACITY, 7,
+	{
+		{ 1, 3, 10, 6, 2 },
+		{ 0.1f, 2, 7, 4, 4 },
+		{ 0.05f, 1, 5, 3, 4 },
+		{ 0.15f, 5, 11, 8, 2 },
+		{ 0.12f, 2, 20, 8, 4 },
+		{ 0.15f, 3, 12, 6, 6 },
+		{ 1, 1, 20, 6, 0 }
+	}
+},
+{
+	RELOAD, 4,
+	{
+		{ 1, 5, 60, 30, 2 },
+		{ 0.5f, 1, 100, 40, 2 },
+		{ 0.02f, 1, 100, 40, 0 },
+		{ 0.35f, 1, 240, 40, 0 }
+	}
+},
+{
+	CAST_DELAY, 4,
+	{
+		{ 1, 1, 30, 5, 2 },
+		{ 0.1f, 1, 50, 15, 3 },
+		{ 0.1f, -15, 15, 0, 3 },
+		{ 0.45f, 0, 35, 12, 0 }
+	}
+},
+{
+	SPREAD, 2,
+	{
+		{ 1, -5, 10, 0, 3 },
+		{ 0.1f, -35, 35, 0, 0 }
+	}
+},
+{
+	SPEED_MULT, 5,
+	{
+		{ 1, 0.8f, 1.2f, 1, 6 },
+		{ 0.05f, 1, 2, 1.1f, 3 },
+		{ 0.05f, 0.5f, 1, 0.9f, 3 },
+		{ 1, 0.8f, 1.2f, 1, 0 },
+		{ 0.001f, 1, 10, 5, 2 }
+	}
+},
+{
+	MULTICAST, 4,
+	{
+		{ 1, 1, 3, 1, 3 },
+		{ 0.2f, 2, 4, 2, 8 },
+		{ 0.05f, 1, 5, 2, 2 },
+		{ 1, 1, 5, 2, 0 }
+	}
+},
+{
+	SHUFFLE,
+	0
+}};
+
+StatProb getGunProbs(WandStat s, StatProbBlock dict[7], NoitaRandom* random)
+{
+	StatProbBlock probs = dict[0];
+	for (int i = 0; i < 7; i++) if (s == dict[i].stat) probs = dict[i];
+	if (probs.count == 0) return {};
+	float sum = 0;
+	for (int i = 0; i < probs.count; i++) sum += probs.probs[i].prob;
+	float rnd = (float)random->Next() * sum;
+	for (int i = 0; i < probs.count; i++)
+	{
+		if (rnd < probs.probs[i].prob) return probs.probs[i];
+		rnd -= probs.probs[i].prob;
+	}
+	return {};
 }
 
-}
-
-uint64 SetRandomSeedHelper(double r)
+void shuffleTable(WandStat table[4], int length, NoitaRandom* random)
 {
-    uint64 e = *(uint64*)&r;
-    if(((e >> 0x20 & 0x7fffffff) < 0x7FF00000)
-       && (-9.223372036854776e+18 <= r) && (r < 9.223372036854776e+18))
-    {
-        //should be same as e &= ~(1<<63); which should also just clears the sign bit,
-        //or maybe it does nothing,
-        //but want to keep it as close to the assembly as possible for now
-        e <<= 1;
-        e >>= 1;
-        double s = *(double*) &e;
-        uint64 i = 0;
-        if(s != 0.0)
-        {
-            uint64 f = (((uint64) e) & 0xfffffffffffff) | 0x0010000000000000;
-            uint64 g = 0x433 - ((uint64) e >> 0x34);
-            uint64 h = f >> g;
-
-            int j = -(uint)(0x433 < ((e >> 0x20)&0xFFFFFFFF) >> 0x14);
-            i = (uint64) j<<0x20 | j;
-            i = ~i & h | f << (((uint64) s >> 0x34) - 0x433) & i;
-            i = ~-(uint64)(r == s) & -i | i & -(uint64)(r == s);
-            // error handling, whatever
-            // f = f ^
-            // if((int) g > 0 && f )
-        }
-        return i & 0xFFFFFFFF;
-    }
-
-    //error!
-    uint64 error_ret_val = 0x8000000000000000;
-    return *(double*) &error_ret_val;
+	for (int i = length - 1; i >= 1; i--)
+	{
+		int j = random->Random(0, i);
+		WandStat temp = table[i];
+		table[i] = table[j];
+		table[j] = temp;
+	}
 }
 
-uint SetRandomSeedHelper2(int param_1,int param_2,uint param_3)
+void applyRandomVariable(Wand* gun, WandStat s, StatProbBlock dict[7], NoitaRandom* random)
 {
-    uint uVar1;
-    uint uVar2;
-    uint uVar3;
+	float cost = gun->cost;
+	StatProb prob = getGunProbs(s, dict, random);
+	float min, max;
+	int rnd;
+	float temp_cost;
 
-    uVar2 = (param_1 - param_2) - param_3 ^ param_3 >> 0xd;
-    uVar1 = (param_2 - uVar2) - param_3 ^ uVar2 << 8;
-    uVar3 = (param_3 - uVar2) - uVar1 ^ uVar1 >> 0xd;
-    uVar2 = (uVar2 - uVar1) - uVar3 ^ uVar3 >> 0xc;
-    uVar1 = (uVar1 - uVar2) - uVar3 ^ uVar2 << 0x10;
-    uVar3 = (uVar3 - uVar2) - uVar1 ^ uVar1 >> 5;
-    uVar2 = (uVar2 - uVar1) - uVar3 ^ uVar3 >> 3;
-    uVar1 = (uVar1 - uVar2) - uVar3 ^ uVar2 << 10;
-    return (uVar3 - uVar2) - uVar1 ^ uVar1 >> 0xf;
+	float actionCosts[] = {
+			0,
+			5 + (gun->capacity * 2),
+			15 + (gun->capacity * 3.5f),
+			35 + (gun->capacity * 5),
+			45 + (gun->capacity * gun->capacity)
+	};
+
+	switch (s)
+	{
+	case RELOAD:
+		min = fminf(fmaxf(60 - (cost * 5), 1), 240);
+		max = 1024;
+		gun->reload = (int)fminf(fmaxf(random->RandomDistribution(prob.min, prob.max, prob.mean, prob.sharpness), min), max);
+		gun->cost -= (60 - gun->reload) / 5;
+		return;
+	case CAST_DELAY:
+		min = fminf(fmaxf(16 - cost, -50), 50);
+		max = 50;
+		gun->delay = (int)fminf(fmaxf(random->RandomDistribution(prob.min, prob.max, prob.mean, prob.sharpness), min), max);
+		gun->cost -= 16 - gun->delay;
+		return;
+	case SPREAD:
+		min = fminf(fmaxf(cost / -1.5f, -35), 35);
+		max = 35;
+		gun->spread = (int)fminf(fmaxf(random->RandomDistribution(prob.min, prob.max, prob.mean, prob.sharpness), min), max);
+		gun->cost -= 16 - gun->spread;
+		return;
+	case SPEED_MULT:
+		gun->speed = random->RandomDistributionf(prob.min, prob.max, prob.mean, prob.sharpness);
+		return;
+	case CAPACITY:
+		min = 1;
+		max = fminf(fmaxf((cost / 5) + 6, 1), 20);
+		if (gun->force_unshuffle)
+		{
+			max = (cost - 15) / 5;
+			if (max > 6)
+				max = 6 + (cost - 45) / 10;
+		}
+
+		max = fminf(fmaxf(max, 1), 20);
+
+		gun->capacity = fminf(fmaxf(random->RandomDistribution(prob.min, prob.max, prob.mean, prob.sharpness), min), max);
+		gun->cost -= (gun->capacity - 6) * 5;
+		return;
+	case SHUFFLE:
+		rnd = random->Random(0, 1);
+		if (gun->force_unshuffle)
+			rnd = 1;
+		if (rnd == 1 && cost >= (15 + gun->capacity * 5) && gun->capacity <= 9)
+		{
+			gun->shuffle = false;
+			gun->cost -= 15 + gun->capacity * 5;
+		}
+		return;
+	case MULTICAST:
+		min = 1;
+		max = 1;
+		for (int i = 0; i < 5; i++)
+		{
+			if (actionCosts[i] <= cost) max = actionCosts[i];
+		}
+		max = fminf(fmaxf(max, 1), gun->capacity);
+
+		gun->multicast = (int)floor(fminf(fmaxf(random->RandomDistribution(prob.min, prob.max, prob.mean, prob.sharpness), min), max));
+		temp_cost = actionCosts[(int)(fminf(fmaxf(gun->multicast, 1), 5) - 1)];
+		gun->cost -= temp_cost;
+		return;
+	default:
+		return;
+	}
 }
 
-
-extern "C"
+Wand GetWandStats(int _cost, int level, bool force_unshuffle, NoitaRandom* random)
 {
+	Wand gun = { level };
+	int cost = _cost;
 
-void SetRandomSeed(uint world_seed, double x, double y)
+	if (level == 1 && random->Random(0, 100) < 50)
+		cost += 5;
+
+	cost += random->Random(-3, 3);
+	gun.cost = cost;
+	gun.capacity = 0;
+	gun.multicast = 0;
+	gun.reload = 0;
+	gun.shuffle = true;
+	gun.delay = 0;
+	gun.spread = 0;
+	gun.speed = 0;
+	gun.prob_unshuffle = 0.1f;
+	gun.prob_draw_many = 0.15f;
+	gun.regen = 50 * level + random->Random(-5, 5 * level);
+	gun.mana = 50 + (150 * level) + random->Random(-5, 5) * 10;
+	gun.force_unshuffle = false;
+	gun.is_rare = false;
+
+	int p = random->Random(0, 100);
+	if (p < 20)
+	{
+		gun.regen = (50 * level + random->Random(-5, 5 * level)) / 5;
+		gun.mana = (50 + (150 * level) + random->Random(5, 5) * 10) * 3;
+	}
+
+	p = random->Random(0, 100);
+	if (p < 15)
+	{
+		gun.regen = (50 * level + random->Random(-5, 5 * level)) * 5;
+		gun.mana = (50 + (150 * level) + random->Random(-5, 5) * 10) / 3;
+	}
+
+	if (gun.mana < 50) gun.mana = 50;
+	if (gun.regen < 10) gun.regen = 10;
+
+	p = random->Random(0, 100);
+	if (p < 15 + level * 6)
+		gun.force_unshuffle = true;
+
+	p = random->Random(0, 100);
+	if (p < 5)
+	{
+		gun.is_rare = true;
+		gun.cost += 65;
+	}
+
+	WandStat variables_01[4] = { RELOAD, CAST_DELAY, SPREAD, SPEED_MULT };
+	WandStat variables_03[4] = { SHUFFLE, MULTICAST };
+
+	shuffleTable(variables_01, 4, random);
+	if (!gun.force_unshuffle) shuffleTable(variables_03, 2, random);
+
+	for (int i = 0; i < 4; i++)
+		applyRandomVariable(&gun, variables_01[i], statProbabilities, random);
+
+	applyRandomVariable(&gun, CAPACITY, statProbabilities, random);
+	for (int i = 0; i < 2; i++)
+		applyRandomVariable(&gun, variables_03[i], statProbabilities, random);
+	if (gun.cost > 5 && random->Random(0, 1000) < 995)
+	{
+		if (gun.shuffle)
+			gun.capacity += (gun.cost / 5.0f);
+		else
+			gun.capacity += (gun.cost / 10.0f);
+		gun.cost = 0;
+	}
+	//gun.capacity = (float)floor(gun.capacity - 0.1f);
+
+	if (force_unshuffle) gun.shuffle = false;
+	if (random->Random(0, 10000) <= 9999)
+	{
+		gun.capacity = fminf(fmaxf(gun.capacity, 2), 26);
+	}
+
+	gun.capacity = fmaxf(gun.capacity, 2);
+
+	if (gun.reload >= 60)
+	{
+		int rnd = 0;
+		while (rnd < 70)
+		{
+			gun.multicast++;
+			rnd = random->Random(0, 100);
+		}
+
+		if (random->Random(0, 100) < 50)
+		{
+			int new_multicast = (int)gun.capacity;
+			for (int i = 1; i <= 6; i++)
+			{
+				int temp = random->Random(gun.multicast, (int)gun.capacity);
+				if (temp < new_multicast)
+					new_multicast = temp;
+			}
+			gun.multicast = new_multicast;
+		}
+	}
+
+	gun.multicast = (int)fminf(fmaxf(gun.multicast, 1), (int)gun.capacity);
+
+	return gun;
+}
+
+Wand GetWand(uint seed, double x, double y, int cost, int level, bool force_unshuffle)
 {
-    uint a = world_seed ^ 0x93262e6f;
-    uint b = a & 0xfff;
-    uint c = (a >> 0xc) & 0xfff;
-
-    double x_ = x+b;
-
-    double y_ = y+c;
-
-    double r = x_*134217727.0;
-    uint64 e = SetRandomSeedHelper(r);
-
-    uint64 _x = (*(uint64*) &x_ & 0x7FFFFFFFFFFFFFFF);
-    uint64 _y = (*(uint64*) &y_ & 0x7FFFFFFFFFFFFFFF);
-    if(102400.0 <= *((double*) &_y) || *((double*) &_x) <= 1.0)
-    {
-        r = y_*134217727.0;
-    }
-    else
-    {
-        double y__ = y_*3483.328;
-        double t = e;
-        y__ += t;
-        y_ *= y__;
-        r = y_;
-    }
-
-    uint64 f = SetRandomSeedHelper(r);
-
-    uint g = SetRandomSeedHelper2(e, f, world_seed);
-    double s = g;
-    s /= 4294967295.0;
-    s *= 2147483639.0;
-    s += 1.0;
-
-    if(2147483647.0 <= s) {
-        s = s*0.5;
-    }
-    random_seed = s;
-
-    Random(0, 0);
-
-    uint h = world_seed&3;
-    while(h)
-    {
-        Random(0, 0);
-        h--;
-    }
+	NoitaRandom random = NoitaRandom(seed);
+	random.SetRandomSeed(x, y);
+	Wand wand = GetWandStats(cost, level, force_unshuffle, &random);
+	return wand;
 }
 
+Wand GetWandWithLevel(uint seed, double x, double y, int level, bool nonshuffle)
+{
+	if (nonshuffle)
+		switch (level)
+		{
+		case 1:
+			return GetWand(seed, x, y, 25, 1, true);
+		case 2:
+			return GetWand(seed, x, y, 40, 2, true);
+		case 3:
+			return GetWand(seed, x, y, 60, 3, true);
+		case 4:
+			return GetWand(seed, x, y, 80, 4, true);
+		case 5:
+			return GetWand(seed, x, y, 100, 5, true);
+		case 6:
+			return GetWand(seed, x, y, 120, 6, true);
+		default:
+			return GetWand(seed, x, y, 180, 11, true);
+		}
+	else
+		switch (level)
+		{
+		case 1:
+			return GetWand(seed, x, y, 30, 1, false);
+		case 2:
+			return GetWand(seed, x, y, 40, 2, false);
+		case 3:
+			return GetWand(seed, x, y, 60, 3, false);
+		case 4:
+			return GetWand(seed, x, y, 80, 4, false);
+		case 5:
+			return GetWand(seed, x, y, 100, 5, false);
+		case 6:
+			return GetWand(seed, x, y, 120, 6, false);
+		default:
+			return GetWand(seed, x, y, 200, 11, false);
+		}
+	return GetWand(seed, x, y, 10, 1, false);
 }
 
-uint world_seed = 0;
+int roundRNGPos(int num)
+{
+	if (-1000000 < num && num < 1000000) return num;
+	else if (-10000000 < num && num < 10000000) return roundf(num / 10.0) * 10;
+	else if (-100000000 < num && num < 100000000) return roundf(num / 100.0) * 100;
+	return num;
+}
 
-double search_spiral_result[2] = {};
+Wand CheckGreatChestLoot(int x, int y, uint worldSeed)
+{
+	NoitaRandom random = NoitaRandom(worldSeed);
+	random.SetRandomSeed(roundRNGPos(x), y);
+
+	int count = 1;
+
+	if (random.Random(0, 100000) >= 100000)
+	{
+		return Wand();
+	}
+
+	while (count != 0)
+	{
+		count--;
+		int rnd = random.Random(1, 100);
+
+		if (rnd <= 30)
+		{
+			rnd = random.Random(0, 100);
+			continue;
+		}
+		else if (rnd <= 33)
+		{
+			continue;
+		}
+		else if (rnd <= 38)
+		{
+			rnd = random.Random(1, 30);
+			continue;
+		}
+		else if (rnd <= 39)
+		{
+			rnd = random.Random(0, 100);
+			Wand w;
+			if (rnd <= 25) w = GetWandWithLevel(worldSeed, x, y, 3, false);
+			else if (rnd <= 50) w = GetWandWithLevel(worldSeed, x, y, 3, true);
+			else if (rnd <= 75) w = GetWandWithLevel(worldSeed, x, y, 4, false);
+			else if (rnd <= 90) w = GetWandWithLevel(worldSeed, x, y, 4, true);
+			else if (rnd <= 96) w = GetWandWithLevel(worldSeed, x, y, 5, false);
+			else if (rnd <= 98) w = GetWandWithLevel(worldSeed, x, y, 5, true);
+			else if (rnd <= 99) w = GetWandWithLevel(worldSeed, x, y, 6, false);
+			else w = GetWandWithLevel(worldSeed, x, y, 6, true);
+			return w;
+		}
+		else if (rnd <= 60)
+		{
+			rnd = random.Random(0, 100);
+			continue;
+		}
+		else if (rnd <= 99)
+			count += 2;
+		else
+			count += 3;
+	}
+	return Wand();
+}
+
+double search_spiral_result[11] = {};
 
 double x_center = 0.0;
 double y_center = 0.0;
@@ -157,17 +703,19 @@ double y_center = 0.0;
 double x_off = 0.0;
 double y_off = 0.0;
 
+double step_mult = 1.0;
+
 double x_step = 1.0;
 double y_step = 0.0;
 
-bool sampo_only = false;
+uint world_seed = 0;
+int cap_threshold = 27;
 
 const double epsilon = 0.1;
 
 extern "C"
 {
-
-    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, bool find_sampo_only)
+    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, int threshold)
     {
         world_seed = raw_world_seed + newgame;
 
@@ -175,6 +723,8 @@ extern "C"
         y_off = 0.0;
 
         x_step = 1.0;
+		if (abs(x) >= 1000000) step_mult = 10;
+		if (abs(x) >= 10000000) step_mult = 100;
         y_step = 0.0;
 
         x_center = x;
@@ -183,7 +733,7 @@ extern "C"
         search_spiral_result[0] = x;
         search_spiral_result[1] = y;
 
-        sampo_only = find_sampo_only;
+		cap_threshold = threshold;
 
         return search_spiral_result;
     }
@@ -202,21 +752,27 @@ int search_spiral_step(uint max_iterations)
     {
         x_seed = floor(x_center+x_off);
         y_seed = floor(y_center+y_off);
-        SetRandomSeed(world_seed, x_seed, y_seed);
-        bool success = false;
-        if(sampo_only) success = Random(0, 100000) == 100000 && Random(0, 1000) != 999;
-        else           success = Random(0, 100000) == 100000 && Random(0, 1000) == 999;
-        if(success)
+		Wand wand = CheckGreatChestLoot((int)x_seed, (int)y_seed, world_seed);
+        if(wand.capacity >= cap_threshold)
         {
             search_spiral_result[0] = x_seed;
             search_spiral_result[1] = y_seed;
+			search_spiral_result[2] = wand.capacity;
+			search_spiral_result[3] = wand.multicast;
+			search_spiral_result[4] = wand.delay;
+			search_spiral_result[5] = wand.reload;
+			search_spiral_result[6] = wand.mana;
+			search_spiral_result[7] = wand.regen;
+			search_spiral_result[8] = wand.spread;
+			search_spiral_result[9] = wand.speed;
+			search_spiral_result[10] = wand.shuffle ? 1 : 0;
             return true;
         }
 
-        x_off += x_step;
-        y_off += y_step;
+        x_off += x_step * step_mult;
+        y_off += y_step * step_mult;
         if((fabs(fabs(x_off)-fabs(y_off)) < epsilon && x_step <= epsilon)
-           || (fabs(x_off-1.0+y_off) < epsilon) && x_step > epsilon)
+           || (fabs(x_off- step_mult +y_off) < epsilon) && x_step > epsilon)
         { //turn
             double temp = x_step;
             x_step = -y_step;
@@ -226,111 +782,6 @@ int search_spiral_step(uint max_iterations)
 
     search_spiral_result[0] = x_seed;
     search_spiral_result[1] = y_seed;
-    return false;
-}
-
-}
-
-int64 search_portal_result[5] = {}; //parallel number, portal number, new game number, x (double), y (double)
-
-double parallel_width = 64*512;
-uint portal_world_seed;
-
-bool portal_sampo_only = false;
-
-double x_portal_room = (42-32)*512;
-double y_portal_room = (28-14)*512;
-
-const double portal_list[] =
-{
-    127-13624, 131-13824,
-    366+7480 , 134-12288,
-    124-17920, 257-7408 ,
-    372+10240, 280+0    ,
-    137-12800, 382+7008 ,
-    358-4396 , 389+8504 ,
-};
-
-extern "C"
-{
-
-    int64* search_portal_start(uint raw_world_seed, int64 parallel_number, bool find_sampo_only)
-    {
-        portal_world_seed = raw_world_seed;
-
-        search_portal_result[0] = parallel_number;
-        search_portal_result[1] = 0;
-        search_portal_result[2] = 0;
-        search_portal_result[3] = 0;
-        search_portal_result[4] = 0;
-
-        portal_sampo_only = find_sampo_only;
-
-        return search_portal_result;
-    }
-
-}
-
-extern "C"
-{
-
-int search_portal_step(uint max_iterations)
-{
-    //search for a magic pixel in a portal
-    int64 parallel_number = search_portal_result[0];
-    double x_seed = 0;
-    double y_seed = 0;
-
-    int64 newgame = 0;
-    int p = 0;
-    for(int i = 0; i < max_iterations; i++)
-    {
-
-        for(newgame = 0; newgame <= 28; newgame++)
-        {
-            if(newgame > 0)
-            {
-                x_portal_room = (42-32)*512;
-                y_portal_room = (28-14)*512;
-                parallel_width = 64*512;
-            }
-            else
-            {
-                x_portal_room = (42-35)*512;
-                y_portal_room = (28-14)*512;
-                parallel_width = 70*512;
-            }
-
-            for(p = 0; p < 6; p++)
-            {
-                x_seed = floor(x_portal_room+parallel_number*parallel_width+portal_list[2*p+0]);
-                y_seed = floor(y_portal_room+portal_list[2*p+1]);
-                uint world_seed = portal_world_seed+newgame;
-                SetRandomSeed(world_seed, x_seed, y_seed);
-                bool success = false;
-                //NOTE: for some reason this does not work, but I'm going to remove it anyway so not worth debugging
-                if(portal_sampo_only) success = Random(0, 10) == 10 && Random(0, 1000) != 999;
-                else                  success = Random(0, 100000) == 100000 && Random(0, 1000) == 999;
-                if(success)
-                {
-                    search_portal_result[0] = parallel_number;
-                    search_portal_result[1] = p;
-                    search_portal_result[2] = newgame;
-                    search_portal_result[3] = *((int64*) &x_seed);
-                    search_portal_result[4] = *((int64*) &y_seed);
-                    return true;
-                }
-            }
-        }
-        if(parallel_number > 0) parallel_number =  -parallel_number;
-        else                    parallel_number = 1-parallel_number;
-    }
-
-    search_portal_result[0] = parallel_number;
-    search_portal_result[1] = p;
-    search_portal_result[2] = newgame;
-    search_portal_result[3] = *((int64*) &x_seed);
-    search_portal_result[4] = *((int64*) &y_seed);
     return false;
 }
 

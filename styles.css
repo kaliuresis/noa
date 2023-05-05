@@ -258,13 +258,15 @@ input[type=number]
     position: absolute;
     text-align:left;
     margin: -0.25em;
-    content: "Orbs:";
+    content: "Wands:";
     font-size: 1.25em;
     font-weight: bold;
 }
 
 #output > *
 {
+	position: relative;
+	top: 1.5em;
     margin: 0;
     padding: 0;
 }
