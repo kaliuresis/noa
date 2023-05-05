@@ -703,7 +703,8 @@ double y_center = 0.0;
 double x_off = 0.0;
 double y_off = 0.0;
 
-double step_mult = 1.0;
+double x_step_mult = 1.0;
+double y_step_mult = 1.0;
 
 double x_step = 1.0;
 double y_step = 0.0;
@@ -727,11 +728,16 @@ extern "C"
 
         x_step = 1.0;
         y_step = 0.0;
+
         //there's a better way to do this with logarithms but this is fast and also easy
         //Chest RNG components are stored with 6 decimal significant digits of precision, so we have to round according to that.
-        if (abs(x) >= 1000000 || abs(y) >= 1000000)        step_mult = 10;
-        else if (abs(x) >= 10000000 || abs(y) >= 10000000) step_mult = 100;
-        else                                               step_mult = 1;
+        if (abs(x) >= 1000000)       x_step_mult = 10;
+        else if (abs(x) >= 10000000) x_step_mult = 100;
+        else                         x_step_mult = 1;
+
+        if (abs(y) >= 1000000)       y_step_mult = 10;
+        else if (abs(y) >= 10000000) y_step_mult = 100;
+        else                         y_step_mult = 1;
 
         x_center = x;
         y_center = y;
@@ -782,10 +788,10 @@ int search_spiral_step(uint max_iterations)
             return true;
         }
 
-        x_off += x_step * step_mult;
-        y_off += y_step * step_mult;
-        if((fabs(fabs(x_off)-fabs(y_off)) < epsilon && x_step <= epsilon)
-           || (fabs(x_off-step_mult+y_off) < epsilon) && x_step > epsilon)
+        x_off += x_step * x_step_mult;
+        y_off += y_step * y_step_mult;
+        if((fabs(fabs(x_off/x_step_mult)-fabs(y_off/y_step_mult)) < epsilon && x_step <= epsilon)
+           || (fabs(x_off/x_step_mult-1+y_off/y_step_mult) < epsilon) && x_step > epsilon)
         { //turn
             double temp = x_step;
             x_step = -y_step;
