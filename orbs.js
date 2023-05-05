@@ -122,6 +122,7 @@ function get_parallel_name(parallel_number, show_main_world = true)
 
 var search_x = 0;
 var search_y = 0;
+var search_iters = 0;
 var search_parallel_number = 0;
 var search_portal_number = 0;
 var search_portal_newgame = 0;
@@ -215,7 +216,10 @@ function update_orbs()
         search_color2 = "#7F5476"
         search_x = getValue(search_spiral_result_ptr, "double");
         search_y = getValue(search_spiral_result_ptr+8, "double");
+        search_iters = getValue(search_spiral_result_ptr+16, "double");
         redraw_map();
+        console.log(search_iters)
+        status.innerHTML = "Searching: " + search_iters + " iters...";
 
         var found_spiral = false
         found_spiral = search_spiral_step(19997)
@@ -228,15 +232,16 @@ function update_orbs()
 
         search_x = getValue(search_spiral_result_ptr, "double");
         search_y = getValue(search_spiral_result_ptr+8, "double");
-        var search_capacity = getValue(search_spiral_result_ptr+16, "double");
-        var search_multicast = getValue(search_spiral_result_ptr+24, "double");
-        var search_delay = getValue(search_spiral_result_ptr+32, "double");
-        var search_reload = getValue(search_spiral_result_ptr+40, "double");
-        var search_mana = getValue(search_spiral_result_ptr+48, "double");
-        var search_regen = getValue(search_spiral_result_ptr+56, "double");
-        var search_spread = getValue(search_spiral_result_ptr+64, "double");
-        var search_speead = getValue(search_spiral_result_ptr+72, "double");
-        var search_shuffle = getValue(search_spiral_result_ptr+80, "double");
+        search_iters = getValue(search_spiral_result_ptr+16, "double");
+        var search_capacity = getValue(search_spiral_result_ptr+24, "double");
+        var search_multicast = getValue(search_spiral_result_ptr+32, "double");
+        var search_delay = getValue(search_spiral_result_ptr+40, "double");
+        var search_reload = getValue(search_spiral_result_ptr+48, "double");
+        var search_mana = getValue(search_spiral_result_ptr+56, "double");
+        var search_regen = getValue(search_spiral_result_ptr+64, "double");
+        var search_spread = getValue(search_spiral_result_ptr+72, "double");
+        var search_speead = getValue(search_spiral_result_ptr+80, "double");
+        var search_shuffle = getValue(search_spiral_result_ptr+88, "double");
 
         ret_string_x = search_x.toString()
         ret_string_y = search_y.toString()

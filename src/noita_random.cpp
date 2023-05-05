@@ -695,7 +695,7 @@ Wand CheckGreatChestLoot(int x, int y, uint worldSeed)
 	return Wand();
 }
 
-double search_spiral_result[11] = {};
+double search_spiral_result[12] = {};
 
 double x_center = 0.0;
 double y_center = 0.0;
@@ -711,6 +711,8 @@ double y_step = 0.0;
 uint world_seed = 0;
 int cap_threshold = 27;
 
+uint searched_pixels = 0;
+
 const double epsilon = 0.1;
 
 extern "C"
@@ -723,8 +725,6 @@ extern "C"
         y_off = 0.0;
 
         x_step = 1.0;
-		if (abs(x) >= 1000000) step_mult = 10;
-		if (abs(x) >= 10000000) step_mult = 100;
         y_step = 0.0;
         //there's a better way to do this with logarithms but this is fast and also easy
         //Chest RNG components are stored with 6 decimal significant digits of precision, so we have to round according to that.
@@ -740,6 +740,8 @@ extern "C"
 
 		cap_threshold = threshold;
 
+		searched_pixels = 0;
+
         return search_spiral_result;
     }
 }
@@ -752,6 +754,7 @@ int search_spiral_step(uint max_iterations)
     //search for a magic pixel in a spiral
     double x_seed = search_spiral_result[0];
     double y_seed = search_spiral_result[1];
+	searched_pixels++;
 
     for(int i = 0; i < max_iterations; i++)
     {
@@ -762,15 +765,16 @@ int search_spiral_step(uint max_iterations)
         {
             search_spiral_result[0] = x_seed;
             search_spiral_result[1] = y_seed;
-			search_spiral_result[2] = wand.capacity;
-			search_spiral_result[3] = wand.multicast;
-			search_spiral_result[4] = wand.delay;
-			search_spiral_result[5] = wand.reload;
-			search_spiral_result[6] = wand.mana;
-			search_spiral_result[7] = wand.regen;
-			search_spiral_result[8] = wand.spread;
-			search_spiral_result[9] = wand.speed;
-			search_spiral_result[10] = wand.shuffle ? 1 : 0;
+            search_spiral_result[2] = searched_pixels;
+			search_spiral_result[3] = wand.capacity;
+			search_spiral_result[4] = wand.multicast;
+			search_spiral_result[5] = wand.delay;
+			search_spiral_result[6] = wand.reload;
+			search_spiral_result[7] = wand.mana;
+			search_spiral_result[8] = wand.regen;
+			search_spiral_result[9] = wand.spread;
+			search_spiral_result[10] = wand.speed;
+			search_spiral_result[11] = wand.shuffle ? 1 : 0;
             return true;
         }
 
@@ -787,6 +791,7 @@ int search_spiral_step(uint max_iterations)
 
     search_spiral_result[0] = x_seed;
     search_spiral_result[1] = y_seed;
+    search_spiral_result[2] = searched_pixels;
     return false;
 }
 
