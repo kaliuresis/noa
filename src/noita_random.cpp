@@ -726,6 +726,11 @@ extern "C"
 		if (abs(x) >= 1000000) step_mult = 10;
 		if (abs(x) >= 10000000) step_mult = 100;
         y_step = 0.0;
+        //there's a better way to do this with logarithms but this is fast and also easy
+        //Chest RNG components are stored with 6 decimal significant digits of precision, so we have to round according to that.
+        if (abs(x) >= 1000000 || abs(y) >= 1000000)        step_mult = 10;
+        else if (abs(x) >= 10000000 || abs(y) >= 10000000) step_mult = 100;
+        else                                               step_mult = 1;
 
         x_center = x;
         y_center = y;
@@ -750,8 +755,8 @@ int search_spiral_step(uint max_iterations)
 
     for(int i = 0; i < max_iterations; i++)
     {
-        x_seed = floor(x_center+x_off);
-        y_seed = floor(y_center+y_off);
+        x_seed = roundRNGPos(floor(x_center+x_off));
+        y_seed = roundRNGPos(floor(y_center+y_off));
 		Wand wand = CheckGreatChestLoot((int)x_seed, (int)y_seed, world_seed);
         if(wand.capacity >= cap_threshold)
         {
@@ -772,7 +777,7 @@ int search_spiral_step(uint max_iterations)
         x_off += x_step * step_mult;
         y_off += y_step * step_mult;
         if((fabs(fabs(x_off)-fabs(y_off)) < epsilon && x_step <= epsilon)
-           || (fabs(x_off- step_mult +y_off) < epsilon) && x_step > epsilon)
+           || (fabs(x_off-step_mult+y_off) < epsilon) && x_step > epsilon)
         { //turn
             double temp = x_step;
             x_step = -y_step;

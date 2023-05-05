@@ -65,6 +65,17 @@ function reset_xy()
     y_input.value = 0;
 }
 
+function far_xy()
+{
+    var x_input = document.getElementById("x");
+    var y_input = document.getElementById("y");
+    var big_number = 1050000;
+    var x_sign = -(y_input.value > 32*512 ? 1:-1);
+    var y_sign = (x_input.value > 28*512 ? 1:-1);
+    x_input.value = x_sign*big_number;
+    y_input.value = y_sign*big_number;
+}
+
 var parallel_width = (64*512)
 var parallel_left_edge_tile = -32
 var parallel_left_edge = parallel_left_edge_tile*512
@@ -227,10 +238,27 @@ function update_orbs()
         var search_speead = getValue(search_spiral_result_ptr+72, "double");
         var search_shuffle = getValue(search_spiral_result_ptr+80, "double");
 
+        ret_string_x = search_x.toString()
+        ret_string_y = search_y.toString()
+
+        //make ranges for rounding imprecision
+        //this continues to be the worst way to implement these things
+        if(Math.abs(search_x) > 1000000) {
+            var plusminus = 5
+            if(Math.abs(search_x) > 10000000) plusminus = 50
+            ret_string_x = (search_x - 0.5).toString() + " \u00B1 " + (plusminus - 0.5).toString()
+        }
+
+        if(Math.abs(search_y) > 1000000) {
+            var plusminus = 5
+            if(Math.abs(search_y) > 10000000) plusminus = 50
+            ret_string_y = (search_y - 0.5).toString() + " \u00B1 " + (plusminus - 0.5).toString()
+        }
+
         search_color = "#FF5E26"
         search_color2 = "#FFE385"
         redraw_map();
-        output.innerHTML += "<p>Wand found at x = " + search_x + ", y = " + search_y + "<\p>";
+        output.innerHTML += "<p>Wand found at x = " + ret_string_x + ", y = " + ret_string_y + "<\p>";
         output.innerHTML += "<p>Capacity: " + Math.floor(search_capacity) + "<\p>";
         output.innerHTML += "<p>Multicast: " + search_multicast + "<\p>";
         output.innerHTML += "<p>Cast Delay: " + (search_delay / 60).toFixed(2) + " sec<\p>";
