@@ -188,8 +188,9 @@ extern "C"
         y_step = 0.0;
         //there's a better way to do this with logarithms but this is fast and also easy
         //Chest RNG components are stored with 6 decimal significant digits of precision, so we have to round according to that.
-        if (abs(x) >= 1000000 || abs(y) >= 1000000) step_mult = 10;
-        if (abs(x) >= 10000000 || abs(y) >= 10000000) step_mult = 100;
+        if (abs(x) >= 1000000 || abs(y) >= 1000000)        step_mult = 10;
+        else if (abs(x) >= 10000000 || abs(y) >= 10000000) step_mult = 100;
+        else                                               step_mult = 1;
 
         x_center = x;
         y_center = y;

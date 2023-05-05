@@ -30,7 +30,7 @@
           <div class="row">
             <span>x:<input type="number" value=0 id="x"></span>
             <span>y:<input type="number" value=0 id="y"></span>
-            <span><button type="button" onclick="reset_xy()">zero</button></span>
+            <span><button type="button" onclick="reset_xy()">zero</button></span><span><button type="button" onclick="far_xy()">farland</button></span>
           </div>
           <div class="row">
           </div>
@@ -53,11 +53,13 @@
             This website displays the locations of all the orbs in Noita, including locations to spawn orb 11 from a great chest.
           </p>
           <p>
-            The Great Chest orb can be obtained by getting a great chest to spawn at exactly the given coordinates. Methods to spawn a great chests include casting end of everything, killing leviathan, or rolling greed dice. You can align an EoE cast at the pixel found by locking yourself in the approximate location, then checking your save00/player.xml.
+            The Great Chest orb can be obtained by getting a great chest to spawn at exactly the given coordinates. You can align an EoE cast at the pixel found by locking yourself in the approximate location, then checking your save00/player.xml.
           </p>
           <p>
             If the Find Sampo option is turned on, it will search for great chest locations that spawn a sampo instead of an orb.
-            There is also a command line version of the great chest searcher that is much faster.
+          </p>
+          <p>
+            The farland button sets the search to locations where coordinate rounding allows for a larger than 1-pixel region to align the chest. Thanks to hämis248 for adding this feature.
           </p>
         </div>
       </div>

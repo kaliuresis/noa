@@ -69,6 +69,17 @@ function reset_xy()
     y_input.value = 0;
 }
 
+function far_xy()
+{
+    var x_input = document.getElementById("x");
+    var y_input = document.getElementById("y");
+    var big_number = 1050000;
+    var x_sign = -(y_input.value > 32*512 ? 1:-1);
+    var y_sign = (x_input.value > 28*512 ? 1:-1);
+    x_input.value = x_sign*big_number;
+    y_input.value = y_sign*big_number;
+}
+
 var parallel_width = (64*512)
 var parallel_left_edge_tile = -32
 var parallel_left_edge = parallel_left_edge_tile*512
@@ -470,13 +481,13 @@ function update_orbs()
         if(Math.abs(search_x) > 1000000) {
             var plusminus = 5
             if(Math.abs(search_x) > 10000000) plusminus = 50
-            ret_string_x = (search_x - plusminus).toString() + " - " + (search_x + plusminus - 1).toString()
+            ret_string_x = (search_x - 0.5).toString() + " \u00B1 " + (plusminus - 0.5).toString()
         }
 
         if(Math.abs(search_y) > 1000000) {
             var plusminus = 5
             if(Math.abs(search_y) > 10000000) plusminus = 50
-            ret_string_y = (search_y - plusminus).toString() + " - " + (search_y + plusminus - 1).toString()
+            ret_string_y = (search_y - 0.5).toString() + " \u00B1 " + (plusminus - 0.5).toString()
         }
 
         search_color = "#FF5E26"
