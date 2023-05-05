@@ -712,12 +712,13 @@ uint world_seed = 0;
 int cap_threshold = 27;
 
 uint searched_pixels = 0;
+bool search_taikas = false;
 
 const double epsilon = 0.1;
 
 extern "C"
 {
-    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, int threshold)
+    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, int threshold, int taikasauva)
     {
         world_seed = raw_world_seed + newgame;
 
@@ -739,6 +740,7 @@ extern "C"
         search_spiral_result[1] = y;
 
 		cap_threshold = threshold;
+		search_taikas = taikasauva != 0;
 
 		searched_pixels = 0;
 
@@ -754,13 +756,15 @@ int search_spiral_step(uint max_iterations)
     //search for a magic pixel in a spiral
     double x_seed = search_spiral_result[0];
     double y_seed = search_spiral_result[1];
-	searched_pixels++;
 
     for(int i = 0; i < max_iterations; i++)
     {
+		searched_pixels++;
         x_seed = roundRNGPos(floor(x_center+x_off));
         y_seed = roundRNGPos(floor(y_center+y_off));
-		Wand wand = CheckGreatChestLoot((int)x_seed, (int)y_seed, world_seed);
+		Wand wand;
+		if(search_taikas) wand = GetWandWithLevel(world_seed, (int)x_seed, (int)y_seed, 3, false);
+		else wand = CheckGreatChestLoot((int)x_seed, (int)y_seed, world_seed);
         if(wand.capacity >= cap_threshold)
         {
             search_spiral_result[0] = x_seed;

@@ -94,6 +94,7 @@ var ng = 0;
 var x0 = 0;
 var y0 = 0;
 var capacity = 27;
+var search_taika = 0;
 var animation_request_id;
 
 function draw_disc(x, y, r)
@@ -124,8 +125,6 @@ var search_x = 0;
 var search_y = 0;
 var search_iters = 0;
 var search_parallel_number = 0;
-var search_portal_number = 0;
-var search_portal_newgame = 0;
 var search_color = "#FFFFFF";
 var search_color2 = "#FFFFFF";
 var show_search = true;
@@ -173,6 +172,7 @@ function update_orbs()
     var x_input = document.getElementById("x");
     var y_input = document.getElementById("y");
     var capacity_input = document.getElementById("capacity");
+    var taika_input = document.getElementById("taika_mode");
     var newgame_plus_map = document.getElementById("newgame_plus_map")
     var newgame_map = document.getElementById("newgame_map")
     world_seed = parseInt(seed.value)
@@ -181,6 +181,7 @@ function update_orbs()
     x0 = parseFloat(x_input.value)
     y0 = parseFloat(y_input.value)
     capacity = parseInt(capacity_input.value)
+    search_taika = taika_input.checked ? 1 : 0;
 
     if(ng > 0)
     {
@@ -277,7 +278,7 @@ function update_orbs()
     }
 
     //start the search
-    var search_spiral_result_ptr = search_spiral_start(world_seed, ng, x0, y0, capacity);
+    var search_spiral_result_ptr = search_spiral_start(world_seed, ng, x0, y0, capacity, search_taika);
     window.cancelAnimationFrame(animation_request_id);
     if(true) animation_request_id = window.requestAnimationFrame(search_step);
     else status.innerHTML = "";
