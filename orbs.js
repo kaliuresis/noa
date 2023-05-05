@@ -209,6 +209,9 @@ function update_orbs()
     search_x = x0
     search_y = y0
 
+    var count = 58373
+    if(search_taika) count = 19287
+
     var parallel_name = ""
     //TODO: stop this loop if button is pressed a second time, currently prints twice and wastes compute
     function search_step(timestamp)
@@ -222,7 +225,7 @@ function update_orbs()
         status.innerHTML = search_iters + " pixels checked...";
 
         var found_spiral = false
-        found_spiral = search_spiral_step(19997)
+        found_spiral = search_spiral_step(count)
 
         if(!found_spiral)
         {
