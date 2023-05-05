@@ -322,6 +322,7 @@ function get_parallel_name(parallel_number, show_main_world = true)
 
 var search_x = 0;
 var search_y = 0;
+var searched_pixels = 0;
 var search_parallel_number = 0;
 var search_portal_number = 0;
 var search_portal_newgame = 0;
@@ -450,6 +451,7 @@ function update_orbs()
 
     search_x = x0
     search_y = y0
+    searched_pixels = 0
 
     var parallel_name = ""
     //TODO: stop this loop if button is pressed a second time, currently prints twice and wastes compute
@@ -459,10 +461,12 @@ function update_orbs()
         search_color2 = "#7F5476"
         search_x = getValue(search_spiral_result_ptr, "double");
         search_y = getValue(search_spiral_result_ptr+8, "double");
+        searched_pixels = getValue(search_spiral_result_ptr+16, "double");
         redraw_map();
+        status.innerHTML = search_iters + " pixels checked...";
 
         var found_spiral = false
-        found_spiral = search_spiral_step(19997)
+        found_spiral = search_spiral_step(24837)
 
         if(!found_spiral)
         {
@@ -481,13 +485,13 @@ function update_orbs()
         if(Math.abs(search_x) > 1000000) {
             var plusminus = 5
             if(Math.abs(search_x) > 10000000) plusminus = 50
-            ret_string_x = (search_x - 0.5).toString() + " \u00B1 " + (plusminus - 0.5).toString()
+            ret_string_x = (search_x).toString() + " \u00B1 " + (plusminus).toString()
         }
 
         if(Math.abs(search_y) > 1000000) {
             var plusminus = 5
             if(Math.abs(search_y) > 10000000) plusminus = 50
-            ret_string_y = (search_y - 0.5).toString() + " \u00B1 " + (plusminus - 0.5).toString()
+            ret_string_y = (search_y).toString() + " \u00B1 " + (plusminus).toString()
         }
 
         search_color = "#FF5E26"

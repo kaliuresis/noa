@@ -157,7 +157,7 @@ int roundRNGPos(int num)
 
 uint world_seed = 0;
 
-double search_spiral_result[2] = {};
+double search_spiral_result[3] = {};
 
 double x_center = 0.0;
 double y_center = 0.0;
@@ -171,6 +171,8 @@ double y_step_mult = 1.0;
 double x_step = 1.0;
 double y_step = 0.0;
 
+uint searched_pixels = 0;
+
 bool sampo_only = false;
 
 const double epsilon = 0.1;
@@ -181,6 +183,7 @@ extern "C"
     double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, bool find_sampo_only)
     {
         world_seed = raw_world_seed + newgame;
+        searched_pixels = 0;
 
         x_off = 0.0;
         y_off = 0.0;
@@ -224,13 +227,15 @@ int search_spiral_step(uint max_iterations)
         x_seed = roundRNGPos(floor(x_center+x_off));
         y_seed = roundRNGPos(floor(y_center+y_off));
         SetRandomSeed(world_seed, x_seed, y_seed);
-        bool success = false;
+        bool success;
         if(sampo_only) success = Random(0, 100000) == 100000 && Random(0, 1000) != 999;
         else           success = Random(0, 100000) == 100000 && Random(0, 1000) == 999;
+        searched_pixels++;
         if(success)
         {
             search_spiral_result[0] = x_seed;
             search_spiral_result[1] = y_seed;
+            search_spiral_result[2] = searched_pixels;
             return true;
         }
 
@@ -247,6 +252,7 @@ int search_spiral_step(uint max_iterations)
 
     search_spiral_result[0] = x_seed;
     search_spiral_result[1] = y_seed;
+    search_spiral_result[2] = searched_pixels;
     return false;
 }
 
