@@ -254,13 +254,13 @@ function update_orbs()
         if(Math.abs(search_x) > 1000000) {
             var plusminus = 5
             if(Math.abs(search_x) > 10000000) plusminus = 50
-            ret_string_x = (search_x - 0.5).toString() + " \u00B1 " + (plusminus - 0.5).toString()
+            ret_string_x = (search_x).toString() + " \u00B1 " + (plusminus).toString()
         }
 
         if(Math.abs(search_y) > 1000000) {
             var plusminus = 5
             if(Math.abs(search_y) > 10000000) plusminus = 50
-            ret_string_y = (search_y - 0.5).toString() + " \u00B1 " + (plusminus - 0.5).toString()
+            ret_string_y = (search_y).toString() + " \u00B1 " + (plusminus).toString()
         }
 
         search_color = "#FF5E26"
