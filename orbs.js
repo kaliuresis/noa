@@ -462,10 +462,27 @@ function update_orbs()
         search_x = getValue(search_spiral_result_ptr, "double");
         search_y = getValue(search_spiral_result_ptr+8, "double");
 
+        ret_string_x = search_x.toString()
+        ret_string_y = search_y.toString()
+
+        //make ranges for rounding imprecision
+        //this continues to be the worst way to implement these things
+        if(Math.abs(search_x) > 1000000) {
+            var plusminus = 5
+            if(Math.abs(search_x) > 10000000) plusminus = 50
+            ret_string_x = (search_x - plusminus).toString() + " - " + (search_x + plusminus - 1).toString()
+        }
+
+        if(Math.abs(search_y) > 1000000) {
+            var plusminus = 5
+            if(Math.abs(search_y) > 10000000) plusminus = 50
+            ret_string_y = (search_y - plusminus).toString() + " - " + (search_y + plusminus - 1).toString()
+        }
+
         search_color = "#FF5E26"
         search_color2 = "#FFE385"
         redraw_map();
-        output.innerHTML += "<p>"+mcguffin_name+" found at</p><p>x = " + search_x + ", y = " + search_y + "<\p>";
+        output.innerHTML += "<p>"+mcguffin_name+" found at</p><p>x = " + ret_string_x + ", y = " + ret_string_y + "<\p>";
         status.innerHTML = "";
     }
 
