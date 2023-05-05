@@ -147,6 +147,14 @@ void SetRandomSeed(uint world_seed, double x, double y)
 
 }
 
+int roundRNGPos(int num)
+{
+    if (-1000000 < num && num < 1000000) return num;
+    else if (-10000000 < num && num < 10000000) return roundf(num / 10.0) * 10;
+    else if (-100000000 < num && num < 100000000) return roundf(num / 100.0) * 100;
+    return num;
+}
+
 uint world_seed = 0;
 
 double search_spiral_result[2] = {};
@@ -156,6 +164,8 @@ double y_center = 0.0;
 
 double x_off = 0.0;
 double y_off = 0.0;
+
+double step_mult = 1.0;
 
 double x_step = 1.0;
 double y_step = 0.0;
@@ -176,6 +186,10 @@ extern "C"
 
         x_step = 1.0;
         y_step = 0.0;
+        //there's a better way to do this with logarithms but this is fast and also easy
+        //Chest RNG components are stored with 6 decimal significant digits of precision, so we have to round according to that.
+        if (abs(x) >= 1000000 || abs(y) >= 1000000) step_mult = 10;
+        if (abs(x) >= 10000000 || abs(y) >= 10000000) step_mult = 100;
 
         x_center = x;
         y_center = y;
@@ -200,8 +214,8 @@ int search_spiral_step(uint max_iterations)
 
     for(int i = 0; i < max_iterations; i++)
     {
-        x_seed = floor(x_center+x_off);
-        y_seed = floor(y_center+y_off);
+        x_seed = roundRNGPos(floor(x_center+x_off));
+        y_seed = roundRNGPos(floor(y_center+y_off));
         SetRandomSeed(world_seed, x_seed, y_seed);
         bool success = false;
         if(sampo_only) success = Random(0, 100000) == 100000 && Random(0, 1000) != 999;
@@ -213,10 +227,10 @@ int search_spiral_step(uint max_iterations)
             return true;
         }
 
-        x_off += x_step;
-        y_off += y_step;
+        x_off += x_step * step_mult;
+        y_off += y_step * step_mult;
         if((fabs(fabs(x_off)-fabs(y_off)) < epsilon && x_step <= epsilon)
-           || (fabs(x_off-1.0+y_off) < epsilon) && x_step > epsilon)
+           || (fabs(x_off-step_mult+y_off) < epsilon) && x_step > epsilon)
         { //turn
             double temp = x_step;
             x_step = -y_step;
