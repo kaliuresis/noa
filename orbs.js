@@ -463,7 +463,7 @@ function update_orbs()
         search_y = getValue(search_spiral_result_ptr+8, "double");
         searched_pixels = getValue(search_spiral_result_ptr+16, "double");
         redraw_map();
-        status.innerHTML = search_iters + " pixels checked...";
+        status.innerHTML = searched_pixels + " pixels checked...";
 
         var found_spiral = false
         found_spiral = search_spiral_step(24837)
