@@ -713,13 +713,16 @@ uint world_seed = 0;
 int cap_threshold = 27;
 
 uint searched_pixels = 0;
-bool search_taikas = false;
+//0: EOE
+//1: Taika
+//2: Tiny
+int search_mode = 0;
 
 const double epsilon = 0.1;
 
 extern "C"
 {
-    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, int threshold, int taikasauva)
+    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, int threshold, int mode)
     {
         world_seed = raw_world_seed + newgame;
 
@@ -746,7 +749,7 @@ extern "C"
         search_spiral_result[1] = y;
 
 		cap_threshold = threshold;
-		search_taikas = taikasauva != 0;
+		search_mode = mode;
 
 		searched_pixels = 0;
 
@@ -769,8 +772,9 @@ int search_spiral_step(uint max_iterations)
         x_seed = roundRNGPos(floor(x_center+x_off));
         y_seed = roundRNGPos(floor(y_center+y_off));
 		Wand wand;
-		if(search_taikas) wand = GetWandWithLevel(world_seed, (int)x_seed, (int)y_seed, 3, false);
-		else wand = CheckGreatChestLoot((int)x_seed, (int)y_seed, world_seed);
+		if (search_mode == 0) 		wand = CheckGreatChestLoot((int)x_seed, (int)y_seed, world_seed);
+		else if(search_mode == 1) 	wand = GetWandWithLevel(world_seed, (int)x_seed, (int)y_seed, 3, false);
+		else 						wand = GetWandWithLevel(world_seed, (int)x_seed + 16, (int)y_seed, 11, true);
         if(wand.capacity >= cap_threshold)
         {
             search_spiral_result[0] = x_seed;
