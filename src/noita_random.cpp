@@ -734,13 +734,13 @@ extern "C"
 
         //there's a better way to do this with logarithms but this is fast and also easy
         //Chest RNG components are stored with 6 decimal significant digits of precision, so we have to round according to that.
-        if (abs(x) >= 1000000)       x_step_mult = 10;
-        else if (abs(x) >= 10000000) x_step_mult = 100;
-        else                         x_step_mult = 1;
+        if (search_mode == 0 && abs(x) >= 1000000)       x_step_mult = 10;
+        else if (search_mode == 0 && abs(x) >= 10000000) x_step_mult = 100;
+		else                        					 x_step_mult = 1;
 
-        if (abs(y) >= 1000000)       y_step_mult = 10;
-        else if (abs(y) >= 10000000) y_step_mult = 100;
-        else                         y_step_mult = 1;
+        if (search_mode == 0 && abs(y) >= 1000000)       y_step_mult = 10;
+        else if (search_mode == 0 && abs(y) >= 10000000) y_step_mult = 100;
+        else                         					 y_step_mult = 1;
 
         x_center = x;
         y_center = y;
@@ -769,8 +769,12 @@ int search_spiral_step(uint max_iterations)
     for(int i = 0; i < max_iterations; i++)
     {
 		searched_pixels++;
-        x_seed = roundRNGPos(floor(x_center+x_off));
-        y_seed = roundRNGPos(floor(y_center+y_off));
+        x_seed = floor(x_center+x_off);
+        y_seed = floor(y_center+y_off);
+		if(search_mode == 0) {
+			x_seed = roundRNGPos(x_seed);
+			y_seed = roundRNGPos(y_seed);
+		}
 		Wand wand;
 		if (search_mode == 0) 		wand = CheckGreatChestLoot((int)x_seed, (int)y_seed, world_seed);
 		else if(search_mode == 1) 	wand = GetWandWithLevel(world_seed, (int)x_seed, (int)y_seed, 3, false);

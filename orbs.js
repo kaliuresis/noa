@@ -52,6 +52,18 @@ function init()
         }
     }
 
+    function change_tiny(event, event2) {
+        if(parseInt(event.target.value) == 2) {
+            var x_input = document.getElementById("x");
+            var y_input = document.getElementById("y");
+            x_input.value = "14941"
+            y_input.value = "18654"
+        }
+    }
+
+    var search_input = document.getElementById("search_mode");
+    search_input.onchange = change_tiny
+
     map_canvas = document.getElementById('map_canvas');
     refresh_canvas_size()
     ctx = map_canvas.getContext('2d');
@@ -251,13 +263,13 @@ function update_orbs()
 
         //make ranges for rounding imprecision
         //this continues to be the worst way to implement these things
-        if(Math.abs(search_x) > 1000000) {
+        if(search_mode == 0 && Math.abs(search_x) > 1000000) {
             var plusminus = 5
             if(Math.abs(search_x) > 10000000) plusminus = 50
             ret_string_x = (search_x).toString() + " \u00B1 " + (plusminus).toString()
         }
 
-        if(Math.abs(search_y) > 1000000) {
+        if(search_mode == 0 && Math.abs(search_y) > 1000000) {
             var plusminus = 5
             if(Math.abs(search_y) > 10000000) plusminus = 50
             ret_string_y = (search_y).toString() + " \u00B1 " + (plusminus).toString()
