@@ -209,7 +209,7 @@ function update_orbs()
     search_x = x0
     search_y = y0
 
-    var count = 48373
+    var count = 38373
     if(search_mode > 0) count = 19287
 
     var parallel_name = ""
