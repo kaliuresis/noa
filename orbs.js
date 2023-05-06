@@ -322,6 +322,7 @@ function get_parallel_name(parallel_number, show_main_world = true)
 
 var search_x = 0;
 var search_y = 0;
+var searched_pixels = 0;
 var search_parallel_number = 0;
 var search_portal_number = 0;
 var search_portal_newgame = 0;
@@ -450,6 +451,7 @@ function update_orbs()
 
     search_x = x0
     search_y = y0
+    searched_pixels = 0
 
     var parallel_name = ""
     //TODO: stop this loop if button is pressed a second time, currently prints twice and wastes compute
@@ -459,10 +461,12 @@ function update_orbs()
         search_color2 = "#7F5476"
         search_x = getValue(search_spiral_result_ptr, "double");
         search_y = getValue(search_spiral_result_ptr+8, "double");
+        searched_pixels = getValue(search_spiral_result_ptr+16, "double");
         redraw_map();
+        status.innerHTML = searched_pixels + " pixels checked...";
 
         var found_spiral = false
-        found_spiral = search_spiral_step(19997)
+        found_spiral = search_spiral_step(24837)
 
         if(!found_spiral)
         {
