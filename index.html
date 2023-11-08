@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Noita Orb Atlas</title>
+  <title>Noita Wand Atlas</title>
   <link rel="icon"
         type="image/webp"
         href="orbicon.webp">
   <link rel="stylesheet" href="styles.css">
   <link href='https://fonts.googleapis.com/css?family=Cinzel Decorative' rel='stylesheet'>
-  <meta name="description" content="Orb Search for Noita">
+  <meta name="description" content="Big Wand Search for Noita">
   <meta name="author" content="Kaliuresis">
   <script src="generated/noita_random.js"></script>
   <script src="orbs.js"></script>
@@ -16,31 +16,49 @@
 <body onload="init()">
   <div class="background_dim"></div>
   <div class="main">
-    <h1>Noita Orb Atlas</h1>
+    <h1>Noita Wand Atlas</h1>
     <div class="main_panel">
       <div class="left_panel">
         <form onsubmit="return update_orbs()">
           <div class="row">
             <span>Seed: <input type="number" value=0 id="seed"></span>
-            <span>NG+ <input type="number" value=1 id="ng"></span>
+            <span>NG+ <input type="number" value=0 id="ng"></span>
           </div>
           <div class="row">
-            <span>Great Chest Search:</span>
+            <span>Wand Search:</span>
           </div>
           <div class="row">
             <span>x:<input type="number" value=0 id="x"></span>
             <span>y:<input type="number" value=0 id="y"></span>
             <span><button type="button" onclick="reset_xy()">zero</button></span><span><button type="button" onclick="far_xy()">farland</button></span>
           </div>
-          <div class="row">
+          <div class="row"><label for="search_mode">Search type:</label>
+            <select id="search_mode" name="search_mode">
+              <option value="0">EoE Chest</option>
+              <option value="1">Taikasauva</option>
+              <option value="2">Tiny Drop</option>
+            </select>
           </div>
           <div class="row">
-            <span class="checkbox_container">Great Chest Search<input type="checkbox" id="search_spiral"></span>
-            <!-- <span class="checkbox_container">Portal Room Search<input type="checkbox" id="search_portal"></span> -->
-            <span class="checkbox_container">Find Sampo<input type="checkbox" id="find_sampo"></span>
+            <span>Stat:</span>
+            <select id="stat" name="stat">
+              <option value="0">Capacity</option>
+              <option value="1">Multicast</option>
+              <option value="2">Cast Delay</option>
+              <option value="3">Reload</option>
+              <option value="4">Max Mana</option>
+              <option value="5">Mana Regen</option>
+              <option value="6">Spread</option>
+              <option value="7">Speed</option>
+            </select>
           </div>
           <div class="row">
-            <button type="submit" id="true_knowledge_button">Seek True Knowledge</button>
+            <span class="stat_span">Value: <input type="number" class="stat_row" step="any" value=27 id="threshold"></span>
+            <span class="checkbox_container">Less Than<input type="checkbox" id="less_than"></span>
+            <span class="checkbox_container">Non-shuffle<input type="checkbox" id="nonshuffle"></span>
+          </div>
+          <div class="row">
+            <button type="submit" id="true_knowledge_button">Seek Big Wands</button>
             <!-- <input type="submit" id="normal_orb_button"value="Normal Orbs Only"> -->
           </div>
         </form>
@@ -50,17 +68,18 @@
         </div>
         <div class="description">
           <p>
-            This website displays the locations of all the orbs in Noita, including locations to spawn orb 11 from a great chest.
+            This website displays the locations Big Wands that can be spawned in various ways. Such wands are occasionally useful for obscure builds that require more than 26 slots.
           </p>
           <p>
-            The Great Chest orb can be obtained by getting a great chest to spawn at exactly the given coordinates. You can align an EoE cast at the pixel found by locking yourself in the approximate location, then checking your save00/player.xml.
+            The Great Chest wands can be obtained by getting a great chest to spawn at exactly the given coordinates. Usually this is done with the End of Everything. Taikasauva wands are spawned with Summon Taikasauva.
+			Tiny drops check the tier 10 non-shufflers dropped when Limatoukka is killed. The coordinates record the pixel that Tiny should die on.
           </p>
           <p>
-            If the Find Sampo option is turned on, it will search for great chest locations that spawn a sampo instead of an orb.
+            The farland button sets the search to locations where coordinate rounding allows for a larger than 1-pixel region to align the chest. This only affects chests, and not taikasauva or Tiny drops.
           </p>
-          <p>
-            The farland button sets the search to locations where coordinate rounding allows for a larger than 1-pixel region to align the chest. Thanks to hämis248 for adding this feature.
-          </p>
+		  <p>
+			All of the web design for this site was done by Kaliuresis! I'm only responsible for the wand code.
+		  </p>
         </div>
       </div>
       <div class="map_panel">
@@ -70,7 +89,7 @@
         <canvas id="map_canvas" width="1280" height="960"> </canvas>
       </div>
     </div>
-    <footer><a href="https://github.com/kaliuresis/findorb11/releases/tag/1.0">Command Line Version</a><a href="https://github.com/kaliuresis/noa">Github</a></footer>
+    <footer><a href="https://kaliuresis.github.io/noa">Original</a><a href="https://github.com/pudy248/noitaBigWandAtlas">Github</a></footer>
   </div>
 </div>
 </body>

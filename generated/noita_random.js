@@ -1295,6 +1295,10 @@ var ASM_CONSTS = {
       }
     }
 
+  function _emscripten_memcpy_big(dest, src, num) {
+      HEAPU8.copyWithin(dest, src, src + num);
+    }
+
   function getCFunc(ident) {
       var func = Module['_' + ident]; // closure exported function
       assert(func, 'Cannot call unknown function ' + ident + ', make sure it is exported');
@@ -1383,29 +1387,17 @@ function checkIncomingModuleAPI() {
   ignoredModuleProp('fetchSettings');
 }
 var asmLibraryArg = {
-  
+  "emscripten_memcpy_big": _emscripten_memcpy_big
 };
 var asm = createWasm();
 /** @type {function(...*):?} */
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__wasm_call_ctors");
 
 /** @type {function(...*):?} */
-var _Random = Module["_Random"] = createExportWrapper("Random");
-
-/** @type {function(...*):?} */
-var _SetRandomSeed = Module["_SetRandomSeed"] = createExportWrapper("SetRandomSeed");
-
-/** @type {function(...*):?} */
 var _search_spiral_start = Module["_search_spiral_start"] = createExportWrapper("search_spiral_start");
 
 /** @type {function(...*):?} */
 var _search_spiral_step = Module["_search_spiral_step"] = createExportWrapper("search_spiral_step");
-
-/** @type {function(...*):?} */
-var _search_portal_start = Module["_search_portal_start"] = createExportWrapper("search_portal_start");
-
-/** @type {function(...*):?} */
-var _search_portal_step = Module["_search_portal_step"] = createExportWrapper("search_portal_step");
 
 /** @type {function(...*):?} */
 var ___errno_location = Module["___errno_location"] = createExportWrapper("__errno_location");
