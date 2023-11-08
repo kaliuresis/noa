@@ -639,6 +639,7 @@ int roundRNGPos(int num)
 
 Wand CheckGreatChestLoot(int x, int y, uint worldSeed)
 {
+	if(x == 0 && y == 0) return {};
 	NoitaRandom random = NoitaRandom(worldSeed);
 	random.SetRandomSeed(roundRNGPos(x), y);
 
@@ -710,7 +711,10 @@ double x_step = 1.0;
 double y_step = 0.0;
 
 uint world_seed = 0;
-int cap_threshold = 27;
+double stat_threshold = 27;
+int stat = 0;
+bool lt = false;
+bool ns = false;
 
 uint searched_pixels = 0;
 //0: EOE
@@ -722,7 +726,7 @@ const double epsilon = 0.1;
 
 extern "C"
 {
-    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, int threshold, int mode)
+    double* search_spiral_start(uint raw_world_seed, uint newgame, double x, double y, int wand_stat, double threshold, int less_than, int nonshuffle, int mode)
     {
         world_seed = raw_world_seed + newgame;
 
@@ -748,8 +752,11 @@ extern "C"
         search_spiral_result[0] = x;
         search_spiral_result[1] = y;
 
-		cap_threshold = threshold;
+		stat_threshold = threshold;
+		stat = wand_stat;
 		search_mode = mode;
+		lt = less_than == 1;
+		ns = nonshuffle == 1;
 
 		searched_pixels = 0;
 
@@ -779,7 +786,36 @@ int search_spiral_step(uint max_iterations)
 		if (search_mode == 0) 		wand = CheckGreatChestLoot((int)x_seed, (int)y_seed, world_seed);
 		else if(search_mode == 1) 	wand = GetWandWithLevel(world_seed, (int)x_seed, (int)y_seed, 3, false);
 		else 						wand = GetWandWithLevel(world_seed, (int)x_seed + 16, (int)y_seed, 11, true);
-        if(wand.capacity >= cap_threshold)
+		bool passed = false;
+		switch(stat) {
+			case 1:
+				passed = wand.multicast >= stat_threshold;
+				break;
+			case 2:
+				passed = wand.delay / 60.0 >= stat_threshold;
+				break;
+			case 3:
+				passed = wand.reload / 60.0 >= stat_threshold;
+				break;
+			case 4:
+				passed = wand.mana >= stat_threshold;
+				break;
+			case 5:
+				passed = wand.regen >= stat_threshold;
+				break;
+			case 6:
+				passed = wand.spread >= stat_threshold;
+				break;
+			case 7:
+				passed = wand.speed >= stat_threshold;
+				break;
+			default:
+				passed = wand.capacity >= stat_threshold;
+				break;
+		}
+		if(lt) passed = !passed;
+		if(ns && wand.shuffle) passed = false;
+        if(passed)
         {
             search_spiral_result[0] = x_seed;
             search_spiral_result[1] = y_seed;

@@ -32,15 +32,30 @@
             <span>y:<input type="number" value=0 id="y"></span>
             <span><button type="button" onclick="reset_xy()">zero</button></span><span><button type="button" onclick="far_xy()">farland</button></span>
           </div>
-          <div class="row"><label for="cars">Search type:</label>
-			<select id="search_mode" name="search_mode">
-			  <option value="0">EoE Chest</option>
-			  <option value="1">Taikasauva</option>
-			  <option value="2">Tiny Drop</option>
-			</select>
+          <div class="row"><label for="search_mode">Search type:</label>
+            <select id="search_mode" name="search_mode">
+              <option value="0">EoE Chest</option>
+              <option value="1">Taikasauva</option>
+              <option value="2">Tiny Drop</option>
+            </select>
           </div>
           <div class="row">
-            <span>capacity:<input type="number" value=27 id="capacity"></span>
+            <span>Stat:</span>
+            <select id="stat" name="stat">
+              <option value="0">Capacity</option>
+              <option value="1">Multicast</option>
+              <option value="2">Cast Delay</option>
+              <option value="3">Reload</option>
+              <option value="4">Max Mana</option>
+              <option value="5">Mana Regen</option>
+              <option value="6">Spread</option>
+              <option value="7">Speed</option>
+            </select>
+          </div>
+          <div class="row">
+            <span class="stat_span">Value: <input type="number" class="stat_row" step="any" value=27 id="threshold"></span>
+            <span class="checkbox_container">Less Than<input type="checkbox" id="less_than"></span>
+            <span class="checkbox_container">Non-shuffle<input type="checkbox" id="nonshuffle"></span>
           </div>
           <div class="row">
             <button type="submit" id="true_knowledge_button">Seek Big Wands</button>

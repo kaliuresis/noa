@@ -243,6 +243,20 @@ input[type=number]
     width: 6em;
 }
 
+span.stat_span
+{
+    left: 0;
+    text-align: start;
+}
+
+input.stat_input
+{
+    position: relative;
+    left: 0;
+    width: 5em;
+}
+
+
 #output_box
 {
     position: relative;

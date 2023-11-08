@@ -6,7 +6,7 @@ var width = null
 var height = null
 var scale = 0
 
-search_spiral_start = Module.cwrap('search_spiral_start', 'number', ['number', 'number', 'number', 'number', 'number'])
+search_spiral_start = Module.cwrap('search_spiral_start', 'number', ['number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number'])
 search_spiral_step = Module.cwrap('search_spiral_step', 'number', ['number'])
 
 function refresh_canvas_size()
@@ -105,7 +105,9 @@ var effective_world_seed = 0;
 var ng = 0;
 var x0 = 0;
 var y0 = 0;
-var capacity = 27;
+var stat = 0;
+var stat_threshold = 27;
+var less_than = false;
 var search_mode = 0;
 var animation_request_id;
 
@@ -183,7 +185,10 @@ function update_orbs()
     var ng_input = document.getElementById("ng");
     var x_input = document.getElementById("x");
     var y_input = document.getElementById("y");
-    var capacity_input = document.getElementById("capacity");
+    var stat_input = document.getElementById("stat");
+    var threshold_input = document.getElementById("threshold");
+    var lt_input = document.getElementById("less_than")
+    var ns_input = document.getElementById("nonshuffle")
     var search_input = document.getElementById("search_mode");
     var newgame_plus_map = document.getElementById("newgame_plus_map")
     var newgame_map = document.getElementById("newgame_map")
@@ -192,7 +197,10 @@ function update_orbs()
     effective_world_seed = world_seed+ng
     x0 = parseFloat(x_input.value)
     y0 = parseFloat(y_input.value)
-    capacity = parseInt(capacity_input.value)
+    stat = parseInt(stat_input.value)
+    stat_threshold = parseFloat(threshold_input.value)
+    less_than = lt_input.checked
+    nonshuffle = ns_input.checked
     search_mode = parseInt(search_input.value);
 
     if(ng > 0)
@@ -292,7 +300,7 @@ function update_orbs()
     }
 
     //start the search
-    var search_spiral_result_ptr = search_spiral_start(world_seed, ng, x0, y0, capacity, search_mode);
+    var search_spiral_result_ptr = search_spiral_start(world_seed, ng, x0, y0, stat, stat_threshold, less_than ? 1 : 0, nonshuffle ? 1 : 0, search_mode);
     window.cancelAnimationFrame(animation_request_id);
     if(true) animation_request_id = window.requestAnimationFrame(search_step);
     else status.innerHTML = "";
