@@ -96,6 +96,7 @@ double stat_threshold = 27;
 int stat = 0;
 bool lt = false;
 bool ns = false;
+bool noac = false;
 
 uint32_t searched_pixels = 0;
 //0: EOE
@@ -107,7 +108,7 @@ const double epsilon = 0.1;
 
 extern "C"
 {
-    double* search_spiral_start(uint32_t raw_world_seed, uint32_t newgame, double x, double y, int wand_stat, double threshold, int less_than, int nonshuffle, int mode)
+    double* search_spiral_start(uint32_t raw_world_seed, uint32_t newgame, double x, double y, int wand_stat, double threshold, int flags, int mode)
     {
         world_seed = raw_world_seed + newgame;
 
@@ -136,8 +137,9 @@ extern "C"
 		stat_threshold = threshold;
 		stat = wand_stat;
 		search_mode = mode;
-		lt = less_than == 1;
-		ns = nonshuffle == 1;
+		lt = flags & 1;
+		ns = flags & 2;
+		noac = flags & 4;
 
 		searched_pixels = 0;
 
@@ -196,6 +198,7 @@ int search_spiral_step(uint32_t max_iterations)
 		}
 		if(lt) passed = !passed;
 		if(ns && wand.shuffle) passed = false;
+		if(noac && wand.alwaysCast > 0) passed = false;
 		
         if(passed)
         {
